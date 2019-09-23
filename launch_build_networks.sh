@@ -28,7 +28,8 @@ cut -f 2,3 external_data/mimTitles.txt | sed -e '/^#/d' > processed_data/omim_di
 mkdir processed_data
 
 #INPUT FILE PATH
-decipher_file_path=~elenarojano/projects/decipher/autocipher/decipher_data/decipher_data_no_filter.txt
+# THE INPUT FILE MUST BE IN THE FORMAT XXX
+input_file_path=/PATH/TO/INPUT/FILE
 
 echo -e  "Total_of_patients\t`cut -f 1 $decipher_file_path | sort -u | wc -l ` " > processed_data/build_metrics
 
