@@ -25,7 +25,7 @@ II. In launch_build_networks.sh introduce the path to the directory where to sav
 
 ## Execution
 
-The templetes have to be executed in a certain order. 
+The templetes have to be executed in a certain order.  
 I. ./launch_build_networks.sh. 
 II. ./launch_analyse_networks.sh. 
 III. ./get_comparative_results.sh. 
