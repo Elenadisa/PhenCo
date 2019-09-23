@@ -1,0 +1,141 @@
+build_phen_gene_network){
+	module load python/anaconda-3_440
+	source ~soft_bio_267/initializes/init_R
+	source ~soft_bio_267/initializes/init_netanalyzer
+	PATH=$current_dir'/scripts/R_scripts':$PATH
+	PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH
+	LAYERS='hpo,HP;regions,\.;patients,[0-9]'
+	?
+	NetAnalyzer.rb -i $net -l $LAYERS -m hypergeometric -u 'hpo,regions;patients' -a loci2phen.txt -N
+	merge_by_cluster.rb -c $cluster_coords_enriched -n loci2phen.txt > loci2phen_coords.txt
+	awk '{if($5 >= "$association_thresold") print $0}' loci2phen_coords.txt > loci2phen_coords_filtered.txt 
+	awk '{print $4 "\t" $1 "\t" $2 "\t" $3}' loci2phen_coords_filtered.txt > phen2coords_filtered_sort.txt
+	get_genes_from_gff.rb -c phen2coords_filtered_sort.txt -g $genome_annotation > phen2gene
+	awk '{print $6 "\t" $1 "\t" $2 "\t" $3}' loci2phen_coords_filtered.txt  > loci2coords_filtered_sort.txt
+	get_genes_from_gff.rb -c loci2coords_filtered_sort.txt -g $genome_annotation > loci2gene
+	cut -f 2,3 $fr_1 | sort -u > pat2loci
+	
+	parse_patients_loci_to_genes.py -p pat2loci -A 0 -a 1 -l loci2gene -B 0 -b 1 | sort -u > pat2gene
+	parse_entrezid_to_symbol.R -i pat2gene -o entrez2gene_symbol
+}
+
+build_phen_phen_network){
+	# Load netanalyzer
+	source ~soft_bio_267/initializes/init_netanalyzer
+	# Input data -> layer HPO have a code 'HP:' and patients code are numbers. We extract columns 1 and 2 of the sourcce file of DECIPHER
+	LAYERS='hpo,HP:;patients,[0-9]'
+	
+	?
+	#execute NetAnalyzer Without parental enrichment
+	NetAnalyzer.rb -i $patient2hpo_unenriched -l $LAYERS -m $metric_type -u 'hpo;patients' -a phen2phen_net
+	
+	#extract HPO with an association index great than a threshold
+	awk '{if($3 >= $association_thresold) print $0}' phen2phen_net > more_spec_pairs_metric
+	cut -f 1,2 more_spec_pairs_metric > more_spec
+
+	echo -e  "Number_of_patients_final_cohort\t`cut -f 1  $patient2hpo_unenriched | sort -u | wc -l` " >> ../build_metrics
+	echo -e  "Number_of_HPO\t`cut -f 2  $patient2hpo_unenriched  | sort -u | wc -l` " >> ../build_metrics
+	echo -e  "Number_of_phenotype_phenotype_pairs\t`wc -l  phen2phen_net | cut -d ' ' -f 1` " >> ../build_metrics
+	echo -e  "Number_of_more_specific_pairs\t`wc -l  more_spec | cut -d ' ' -f 1` " >> ../build_metrics
+	
+}
+
+
+generate_less_spec_pairs){
+	module load python/anaconda-3_440
+	source ~soft_bio_267/initializes/init_R
+	export PATH=$current_dir'scripts/py_scripts':$PATH
+	mkdir less_spec_pairs
+	mkdir random_less_spec_pairs
+	#extract HPO with an association index less than a threshold
+	awk '{if($3 < $association_low_thresold) print $0}' build_phen_phen_network)/phen2phen_net > less_specific_pairs
+	#establish the number of pairs of the real network
+	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
+	calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > all_hpo_prevalence
+	echo -e  "Number_of_less_specific_pairs\t`wc -l  less_specific_pairs | cut -d ' ' -f 1` " >> ../build_metrics
+ 
+	for i in {1..$number_of_random_models}
+	do
+	?
+   	#extract randomly the same number of pairs thatn in the previous network
+   		shuf -n $pair_number less_specific_pairs | cut -f 1,2 > less_spec_pairs/less_spec_$i
+   		randomize_network.R -n less_spec_pairs/less_spec_$i -o random_less_spec_pairs/less_spec_n_rdm_$i -r nodes
+   		randomize_network.R -n less_spec_pairs/less_spec_$i -o random_less_spec_pairs/less_spec_l_rdm_$i -r links
+   			
+	done
+
+}
+
+generate_random_models_[links;nodes]){
+	#initialize R
+	source ~soft_bio_267/initializes/init_R
+	name=`echo | awk '{if("(*)" == "links") print "more_spec_l_rdm"; else print "more_spec_n_rdm" }'`
+	mkdir random_models
+	for i in {1..$number_of_random_models}
+	do
+	?
+		#Create 2 random model from the real network.
+		randomize_network.R -n build_phen_phen_network)/more_spec -o random_models/$name"_"$i -r (*)
+
+	done 
+}
+
+generated_unconnected_pairs){
+	module load python/anaconda-3_440	
+	export PATH=$current_dir'scripts/py_scripts':$PATH
+	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
+	mkdir random_models
+	?
+	non_connected.py -f $patient2hpo_unenriched -n build_phen_phen_network)/phen2phen_net > unconnected_phen
+	echo -e  "Number_of_unconnected_pairs\t`wc -l  unconnected_phen| cut -d ' ' -f 1` " >> ../build_metrics
+	for i in {1..$number_of_random_models}
+	do
+		shuf -n $pair_number unconnected_phen > random_models/unconnected_$i
+	done
+}
+
+collect_all_networks){
+	#collecting all generated network in the same directory
+	rm -rf working_networks
+	mkdir working_networks
+	?
+	ln -s build_phen_phen_network)/more_spec working_networks
+	ln -s generate_less_spec_pairs)/less_spec_pairs/* working_networks
+	ln -s generate_less_spec_pairs)/random_less_spec_pairs/* working_networks
+	ln -s generate_random_models_links)/random_models/* working_networks
+	ln -s generate_random_models_nodes)/random_models/* working_networks
+	ln -s generated_unconnected_pairs)/random_models/* working_networks
+}
+
+get_genes_for_each_term){
+	#get the unic nodes in the main network
+	cut -f 2 $patient2hpo_unenriched  | sort -u  > uniq_nodes
+	?
+	#HPO gene association
+	
+	grep -F -f uniq_nodes build_phen_gene_network)/phen2gene > term_gene_pairs
+}
+
+single_term_enrichment_analysis_[kegg;go;reactome]){
+	#Initialize R
+	source ~soft_bio_267/initializes/init_R
+
+	parsed_p_values=`echo '$p_values' | tr '/' ' '`
+	for PVALUE in $parsed_p_values
+	do
+		?
+		#Do an enrichment analysis if the single pairs in kegg, go, reactome
+		enrich_by_onto.R -p $PVALUE -e (*) -o enrich_(*)_single_$PVALUE -n get_genes_for_each_term)/term_gene_pairs
+	done
+	
+}
+
+collect_single_enrichment_analysis){
+	rm -rf enrichments
+	mkdir enrichments
+	?
+	ln -s single_term_enrichment_analysis_go)/enrich_*_single* enrichments
+	ln -s single_term_enrichment_analysis_kegg)/enrich_*_single* enrichments
+	ln -s single_term_enrichment_analysis_reactome)/enrich_*_single* enrichments
+}
