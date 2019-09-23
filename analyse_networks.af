@@ -1,0 +1,301 @@
+term_pairs_comention_analysis){
+	#Initialize R and python
+    module load python/anaconda-3_440
+    source ~soft_bio_267/initializes/init_R
+    PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH 
+
+    echo $working_net
+    net_name=`basename $working_net`
+    net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+    ?
+    get_fisher.R -r $working_net -d $HPO2pubmed -i V2 -e V4 >> pval_table 2> failed_pairs
+    # Write the output file location to metrics
+    echo -e "$net_name\t$net_type\tcomention_analysis\t`pwd`/pval_table" >> ../metrics
+
+    get_comention_PMID.py -f $HPO2pubmed -n $working_net  > pmid_table
+    echo -e "$net_name\t$net_type\tpmid_analysis\t`pwd`/pmid_table" >> ../metrics
+}
+
+obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair){
+	module load python/anaconda-3_440
+	module load ruby/2.4.1
+	source ~soft_bio_267/initializes/init_R
+	PATH=$current_dir'/scripts/R_scripts':$PATH
+	PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH 
+	#Prepare the disease dictionary, of OMIM and ORPHANET diseases
+	cut -f 1,4 $disease_to_genes_to_phenotypes | sort -u > disease_dictionary
+	grep OMIM disease_dictionary > OMIM_disease_dictionary
+	grep ORPHA disease_dictionary > ORPHA_disease_dictionary
+	?
+	#Find the genes of each HPO pair
+	merge_terms.rb -p $working_net -m $term2gene_dictionary > term2term_gene_pairs
+	
+	#Find the common diseases of each HPO pair
+	merge_diseases_terms.R -i OMIM_disease_dictionary -n $working_net -o pairs_OMIM_diseases
+	merge_diseases_terms.R -i ORPHA_disease_dictionary -n $working_net -o pairs_ORPHA_diseases
+
+	#Topology analysis
+	network_topology_analysis.R -i $working_net -o hpo_frequency > topol_results
+	echo -e "$net_name\t$net_type\ttop_analysis\t`pwd`/hpo_frequency" >> ../metrics
+	
+	#get the name of the network, the type (deleting the numbers of the network name) and the metrics we have caculated
+	net_name=`basename $working_net`
+	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+	
+	#Prevalence analysis per HPO
+	prevalence_merger.py -f $hpo_prevalence_file -A 0 -a 1 -n $working_net -o prevalence_vector_decipher -m $net_type
+	echo -e "$net_name\t$net_type\tdecipher_pairs_prevalence\t`pwd`/prevalence_vector_decipher" >> ../metrics
+
+
+	#Number of gene per HPO, intersection and union genes per HPO pair
+	gene_count.py -f $term2gene_dictionary -n $working_net -o vector_genes_data -m $net_type
+	echo -e "$net_name\t$net_type\tpairs_genes_table\t`pwd`/vector_genes_data" >> ../metrics
+	
+	#establish the number of common diseases we use as threshold (at least 1, 2 or 3 diseases) and for each threshold value it does:
+	for CUT in 1 2 3
+	do
+		#get the name of the network, type of the network, if the hpo terms of the pairs_OMIM diseases are geater or equal to the thresehold (confirmed pairs), n sum 1. At the end it will print the number os pairs with equal or more than the threshold
+        echo -e "$net_name\t$net_type\tconfirmed_pairs_OMIM_cut_$CUT\t` awk '{if($3 >= '$CUT') n++ } END {print n}' pairs_OMIM_diseases `" >> ../metrics
+        echo -e "$net_name\t$net_type\tconfirmed_pairs_ORPHA_cut_$CUT\t` awk '{if($3 >= '$CUT') n++ } END {print n}' pairs_ORPHA_diseases `" >> ../metrics
+        filter_hpo_diseases.py -i pairs_OMIM_diseases -t $CUT  > pairs_OMIM_diseases_selected_cut_$CUT
+		filter_hpo_diseases.py -i pairs_ORPHA_diseases -t $CUT > pairs_ORPHA_diseases_selected_cut_$CUT
+		echo -e "$net_name\t$net_type\tUnion_Diseases_cut_$CUT\t` cat pairs_OMIM_diseases_selected_cut_$CUT pairs_ORPHA_diseases_selected_cut_$CUT | cut -f 1,2 | sort -u | wc -l`" >> ../metrics
+		echo -e "$net_name\t$net_type\tIntersection_Diseases_cut_$CUT\t` cat pairs_OMIM_diseases_selected_cut_$CUT pairs_ORPHA_diseases_selected_cut_$CUT | cut -f 1,2 | sort | uniq -d | wc -l `" >> ../metrics
+
+
+	done
+	#While read the topological metrics contained in results file, it creates a line with the network name, type of network and the topological parameters(which are the lines of the result files)
+	while read topological_metric
+	do
+        echo -e "$net_name\t$net_type\t$topological_metric" >> ../metrics
+	done < topol_results
+    
+    
+}	
+
+
+
+term_pairs_enrichment_analysis_[kegg;go;reactome]){
+	#Initialize R and ruby
+	module load ruby/2.4.1
+	source ~soft_bio_267/initializes/init_R
+	
+	net_name=`basename $working_net`
+	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+	parsed_p_values=`echo '$p_values' | tr '/' ' '`
+	for PVALUE in $parsed_p_values
+	do
+		?
+		#Do the enrichment analysis of the HPO pairs
+		enrich_by_onto.R -p $PVALUE -e (*) -o enrich_(*)_pair_$PVALUE -n obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/term2term_gene_pairs
+		
+		#Compare the results of pair enrichment with single enrichment
+		enrichment_comparer.rb -s $single_enrichments/enrich_(*)_single_$PVALUE -p enrich_(*)_pair_$PVALUE > enrichment_stats_(*)_$PVALUE
+		awk '{ if ($4 =="1" && $5 == "1" && $6 == "1") print $1 "\t" $2 "\t" $3 }' enrichment_stats_(*)_$PVALUE > consistent_pairs_(*)_$PVALUE 
+		awk '{ if ($4 =="0" && $5 == "0" && $6 == "1") print $1 "\t" $2 "\t" $3 }' enrichment_stats_(*)_$PVALUE > emergent_pairs_(*)_$PVALUE
+		awk '{ if ($4 =="1" && $5 == "1" && $6 == "0") print $1 "\t" $2 "\t" $3 }' enrichment_stats_(*)_$PVALUE > lost_pairs_(*)_$PVALUE 
+		cut -f 1,2 consistent_pairs_(*)_$PVALUE emergent_pairs_(*)_$PVALUE | sort -u > union_pairs_(*)_$PVALUE
+
+		cut -f 1,2 consistent_pairs_(*)_$PVALUE emergent_pairs_(*)_$PVALUE lost_pairs_(*)_$PVALUE | sort -u > valid_pairs_(*)_$PVALUE
+
+		cat consistent_pairs_(*)_$PVALUE  emergent_pairs_(*)_$PVALUE lost_pairs_(*)_$PVALUE | sort -u > pairs_systems_file_(*)_$PVALUE
+
+		echo -e "$net_name\t$net_type\tconsistent_enriched_terms_(*)_$PVALUE\t` wc -l consistent_pairs_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+        echo -e "$net_name\t$net_type\temergent_enriched_terms_(*)_$PVALUE\t` wc -l emergent_pairs_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+
+        echo -e "$net_name\t$net_type\tpairs_with_emergent_terms_(*)_$PVALUE\t` cut -f 1,2 emergent_pairs_(*)_$PVALUE | sort -u | wc -l`" >> ../metrics
+        echo -e "$net_name\t$net_type\tpairs_with_consistent_terms_(*)_$PVALUE\t` cut -f 1,2 consistent_pairs_(*)_$PVALUE | sort -u | wc -l`" >> ../metrics
+
+		echo -e "$net_name\t$net_type\tlost_pairs_(*)_$PVALUE\t` wc -l lost_pairs_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+		echo -e "$net_name\t$net_type\thpo_pairs_with_at_least_1term_(*)_$PVALUE\t` wc -l union_pairs_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+		
+		
+	done
+}
+
+
+clustering_analysis_[kegg;go;reactome]){
+	resources: -m 2gb -t '7-00:00:00' -n 'cal'
+	module load python/anaconda-3_440
+	source ~soft_bio_267/initializes/init_R
+	PATH=$current_dir'/scripts/R_scripts':$PATH
+	PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH
+	net_name=`basename $working_net`
+	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+	parsed_p_values=`echo '$p_values' | tr '/' ' '`
+	for PVALUE in $parsed_p_values
+	do
+		?
+
+		#Calculate Clusters
+
+		clustering.R -i !term_pairs_enrichment_analysis_*!/valid_pairs_(*)_$PVALUE -n clusters_file_(*)_$PVALUE -t $net_name -s summary_dendograme_(*)_$PVALUE.png -d top_connected_nodes_(*)_$PVALUE.png -r relationship_between_communities_(*)_$PVALUE.png -c cytoscape_file_(*)_$PVALUE
+		calculate_cluster_average.py -c clusters_file_(*)_$PVALUE -A 1 -B 0 -e (*) -p $PVALUE -m $net_type -n $net_name >> ../metrics
+		
+		#Look Cluster overlap of clusters HPOS with diseases HPOs
+			#OMIM
+		cluster_diseases_merger.py -a clusters_file_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 0 > relations_OMIM_(*)_$PVALUE
+		cluster_diseases_merger.py -a clusters_file_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 1 > relations_OMIM_missing_1_(*)_$PVALUE
+
+		echo -e  "$net_name\t$net_type\tclusters_number_(*)_$PVALUE\t`cut -f 2  clusters_file_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_(*)_$PVALUE\t`cut -f 1  relations_OMIM_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_in_clusters_(*)_$PVALUE\t`cut -f 2  relations_OMIM_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_missing_1_(*)_$PVALUE\t`cut -f 1  relations_OMIM_missing_1_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_in_clusters_missing_1_(*)_$PVALUE\t`cut -f 2  relations_OMIM_missing_1_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		
+			#ORPHANET
+		cluster_diseases_merger.py -a clusters_file_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 0 > relations_ORPHA_(*)_$PVALUE
+		cluster_diseases_merger.py -a clusters_file_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 1 > relations_ORPHA_missing_1_(*)_$PVALUE	
+	
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_in_clusters_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_missing_1_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_missing_1_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_in_clusters_missing_1_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_missing_1_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+		#Look for total coherence Functional systems to HPO in clusters
+
+		cluster_systems_merger_threshold.py -c cytoscape_file_(*)_$PVALUE -A 0 -a 2 -x 4 -d !term_pairs_enrichment_analysis_*!/pairs_systems_file_(*)_$PVALUE -B 0 -b 1 -y 2 -s $single_enrichments/enrich_(*)_single_$PVALUE -E 0 -e 1 -o clusters_pathways_enrich_100_percent_(*)_$PVALUE -t 100 > clusters_enrich_with_duplicate_100_percent_(*)_$PVALUE
+		sort -u clusters_enrich_with_duplicate_100_percent_(*)_$PVALUE | sort -k2> clusters_enrich_100_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_number_enrich_100_percent_(*)_$PVALUE\t`cut -f 2  clusters_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		rm clusters_enrich_with_duplicate_100_percent_(*)_$PVALUE
+
+		#Look for 70 percent coherence Functional systems to HPO in clusters
+		cluster_systems_merger_threshold.py -c cytoscape_file_(*)_$PVALUE -A 0 -a 2 -x 4 -d !term_pairs_enrichment_analysis_*!/pairs_systems_file_(*)_$PVALUE -B 0 -b 1 -y 2 -s $single_enrichments/enrich_(*)_single_$PVALUE -E 0 -e 1 -o clusters_pathways_enrich_70_percent_(*)_$PVALUE -t 70 > clusters_enrich_70_percent_with_duplicate_(*)_$PVALUE
+		sort -u clusters_enrich_70_percent_with_duplicate_(*)_$PVALUE | sort -k2> clusters_enrich_70_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_enrich_70_percent_(*)_$PVALUE\t`cut -f 2  clusters_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		rm clusters_enrich_70_percent_with_duplicate_(*)_$PVALUE
+
+		
+		#Look for overlap between clusters with total coherence with functional systems HPOs and diseases HPOs
+			
+			#OMIM
+		cluster_diseases_merger.py -a clusters_enrich_100_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 0 > relations_OMIM_enrich_100_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_enrich_100_percent_(*)_$PVALUE\t`cut -f 1  relations_OMIM_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_enrich_100_percent_(*)_$PVALUE\t`cut -f 2  relations_OMIM_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		cluster_diseases_merger.py -a clusters_enrich_100_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 1 > relations_OMIM_missing_1_enrich_100_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_missing_1_enrich_100_percent_(*)_$PVALUE\t`cut -f 1  relations_OMIM_missing_1_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_in_clusters_missing_1_enrich_100_percent_(*)_$PVALUE\t`cut -f 2  relations_OMIM_missing_1_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+			#ORPHANET
+		cluster_diseases_merger.py -a clusters_enrich_100_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 0 > relations_ORPHA_enrich_100_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_enrich_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_enrich_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		cluster_diseases_merger.py -a clusters_enrich_100_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 1 > relations_ORPHA_missing_1_enrich_100_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_missing_1_enrich_100_percent_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_missing_1_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_in_clusters_missing_1_enrich_100_percent_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_missing_1_enrich_100_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+
+		#Look for overlap between clusters with 70 percent coherence with functional systems HPOs and diseases HPOs
+
+			#OMIM
+		cluster_diseases_merger.py -a clusters_enrich_70_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 0 > relations_OMIM_enrich_70_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_enrich_70_percent_(*)_$PVALUE\t`cut -f 1  relations_OMIM_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_enrich_70_percent_(*)_$PVALUE\t`cut -f 2  relations_OMIM_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		cluster_diseases_merger.py -a clusters_enrich_70_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 1 > relations_OMIM_missing_1_enrich_70_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_omim_diseases_missing_1_enrich_70_percent_(*)_$PVALUE\t`cut -f 1  relations_OMIM_missing_1_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\tomim_diseases_in_clusters_missing_1_enrich_70_percent_(*)_$PVALUE\t`cut -f 2  relations_OMIM_missing_1_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+			#ORPHANET
+		cluster_diseases_merger.py -a clusters_enrich_70_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 0 > relations_ORPHA_enrich_70_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_enrich_70_percent_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_enrich_70_percent_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		cluster_diseases_merger.py -a clusters_enrich_70_percent_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/ORPHA_disease_dictionary -B 0 -y 1 -t 1 > relations_ORPHA_missing_1_enrich_70_percent_(*)_$PVALUE
+		echo -e  "$net_name\t$net_type\tclusters_with_orpha_diseases_missing_1_enrich_70_percent_(*)_$PVALUE\t`cut -f 1  relations_ORPHA_missing_1_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+		echo -e  "$net_name\t$net_type\torpha_diseases_in_clusters_missing_1_enrich_70_percent_(*)_$PVALUE\t`cut -f 2  relations_ORPHA_missing_1_enrich_70_percent_(*)_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+		
+		#Summary files
+		
+		systems_hpo_merger.py -c clusters_file_(*)_$PVALUE -A 1 -x 0 -s clusters_pathways_enrich_70_percent_(*)_$PVALUE -B 0 -y 1 > systems_hpo_(*)_$PVALUE
+
+		
+
+	done
+}
+
+clustering_metrics_[kegg;go;reactome]){
+	resources: -m 2gb -t '7-00:00:00' -n 'cal'
+	module load python/anaconda-3_440
+	PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH
+	net_name=`basename $working_net`
+	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+	parsed_p_values=`echo '$p_values' | tr '/' ' '`
+	for PVALUE in $parsed_p_values
+	do
+		?
+		#Clusters Details
+		patient_cluster_merger.py -c !clustering_analysis_*!/clusters_file_(*)_$PVALUE -A 1 -x 0 -p $phen2pat -B 0 -y 1 -l 0 -s 1 > patients_cluster_hpo_(*)_$PVALUE
+		echo -e "$net_name\t$net_type\tpatients_cluster_hpo_(*)_$PVALUE\t`pwd`/patients_cluster_hpo_(*)_$PVALUE" >> ../metrics
+		
+
+		parse_system_data.py -s $single_enrichments/enrich_(*)_single_$PVALUE -A 1 -a 8 -p !term_pairs_enrichment_analysis_*!/enrich_(*)_pair_$PVALUE  -B 1 -b 8 -e (*) -g $entrez2gene_symbol -C 0 -c 1 -t genes > systems_genes_(*)_$PVALUE
+		parse_system_data.py -s $single_enrichments/enrich_(*)_single_$PVALUE -A 1 -a 2 -p !term_pairs_enrichment_analysis_*!/enrich_(*)_pair_$PVALUE  -B 1 -b 2 -e (*) -g $entrez2gene_symbol -C 0 -c 1 -t names > systems_names_(*)_$PVALUE
+		
+		cluster_patient_systems_merger.py -c !clustering_analysis_*!/clusters_file_(*)_$PVALUE -A 1 -a 0 -p $phen2pat -B 0 -b 1 -s !clustering_analysis_*!/clusters_pathways_enrich_70_percent_(*)_$PVALUE -D 0 -d 1 -S systems_genes_(*)_$PVALUE -E 0 -e 1 -P $pat2gene -F 0 -f 1 -g $entrez2gene_symbol -I 0 -i 1 -t 1 -n 1 > patient_coincidence_with_clusters_and_gene_systems_(*)_$PVALUE
+		tail -n +2 patient_coincidence_with_clusters_and_gene_systems_(*)_$PVALUE | cut -f 1 | sort -u > patients_corresponding_to_funsys_(*)_$PVALUE
+		echo -e "$net_name\t$net_type\tpatient_coincidence_with_clusters_and_gene_systems_(*)_$PVALUE\t`pwd`/patient_coincidence_with_clusters_and_gene_systems_(*)_$PVALUE" >> ../metrics
+        
+        parse_clusters_data.py -c !clustering_analysis_*!/clusters_file_(*)_$PVALUE -A 1 -x 0 -C 0 -d $HPO_table  -B 0 -y 1 -D 0 -t hpos -g systems_genes_(*)_$PVALUE -F 0 -z 1 > Cluster_hpo_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tCluster_hpo_(*)_$PVALUE\t`pwd`/Cluster_hpo_(*)_$PVALUE" >> ../metrics
+
+        parse_clusters_data.py -c !clustering_analysis_*!/clusters_pathways_enrich_70_percent_(*)_$PVALUE -A 0 -x 1 -a 2 -C 0 -d systems_names_(*)_$PVALUE  -B 0 -y 1 -D 0 -t systems -g systems_genes_(*)_$PVALUE -F 0 -z 1 > Cluster_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tCluster_(*)_$PVALUE\t`pwd`/Cluster_(*)_$PVALUE" >> ../metrics
+
+        parse_clusters_data.py -c !clustering_analysis_*!/relations_OMIM_missing_1_(*)_$PVALUE -A 0 -x 1 -a 2 -C 0 -d $OMIM_diseases  -B 0 -y 1 -D 1 -t diseases -g systems_genes_(*)_$PVALUE -F 0 -z 1 > Cluster_omim_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tCluster_omim_(*)_$PVALUE\t`pwd`/Cluster_omim_(*)_$PVALUE" >> ../metrics
+        
+
+       	# Patients overlap with clusters details
+        
+        echo -e "$net_name\t$net_type\tnumber_of_patients_corresponding_to_at_least_1_cluster_(*)_$PVALUE\t`tail -n +2 patients_cluster_hpo_(*)_$PVALUE | cut -f 2 | sort -u | wc -l`" >> ../metrics
+        echo -e "$net_name\t$net_type\tnumber_of_patients_corresponding_to_funsys_(*)_$PVALUE\t`wc -l patients_corresponding_to_funsys_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+
+        parse_patient_systems_hpo_merger.py -c !clustering_analysis_*!/relations_OMIM_missing_1_(*)_$PVALUE -A 0 -x 1  -O 0 -d $OMIM_diseases  -B 0 -y 1  -o 1 -p patients_cluster_hpo_(*)_$PVALUE -C 0 -z 1  > patient_cluster_omim_(*)_$PVALUE
+        tail -n +2 patient_cluster_omim_(*)_$PVALUE | cut -f 1 | sort -u > patients_corresponding_to_omim_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tnumber_of_patients_corresponding_to_omim_(*)_$PVALUE\t`wc -l patients_corresponding_to_omim_(*)_$PVALUE | cut -f 1 -d ' ' `" >> ../metrics
+
+        echo -e "$net_name\t$net_type\tnumber_of_patients_corresponding_both_funsys_omim_(*)_$PVALUE\t`cat patients_corresponding_to_omim_(*)_$PVALUE patients_corresponding_to_funsys_(*)_$PVALUE | sort | uniq -d | wc -l`" >> ../metrics
+
+        # Patient Details
+        merge_patient_hpo_gene.py -p $phen2pat -A 0 -a 1 -f $term2gene_dictionary -B 0 -b 1 -g $pat2gene -C 0 -c 1 -n $HPO_table -D 0 -d 1 -s $entrez2gene_symbol -E 0 -e 1 > patient_hpo_genes_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tpatient_hpo_genes_(*)_$PVALUE\t`pwd`/patient_hpo_genes_(*)_$PVALUE" >> ../metrics
+
+
+
+	done
+}
+
+collect_systems_hpo_files){
+	resources: -m 2gb -t '7-00:00:00' -n 'cal'
+	module load python/anaconda-3_440
+	net_name=`basename $working_net`
+	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
+	PATH=$current_dir'/scripts/py_scripts':$PATH
+	export PATH
+	parsed_p_values=`echo '$p_values' | tr '/' ' '`
+	for PVALUE in $parsed_p_values
+	do
+
+		?
+
+		cat !clustering_analysis_!/systems_hpo_*_$PVALUE > "all_system_hpo_"$PVALUE"_results"
+		system_patients_merger.py -p $phen2pat -A 0 -x 1 -s "all_system_hpo_"$PVALUE"_results" -B 1 -y 0 -t 0 -q 1 -n 1 -c 0 > patients_systems_cases_$PVALUE
+		echo -e "$net_name\t$net_type\tpatients_systems_cases\t`pwd`/patients_systems_cases_$PVALUE" >> ../metrics
+
+		cat !clustering_metrics_!/patients_cluster_hpo_*_$PVALUE | sed '/Cluster/d' > all_patients_cluster_hpo_$PVALUE
+		echo -e  "$net_name\t$net_type\tpatient_overlaping_with_clusters\t` cut -f 2 all_patients_cluster_hpo_$PVALUE | sort -u | wc -l` " >> ../metrics
+
+		cat !clustering_metrics_!/patients_corresponding_to_funsys_*_$PVALUE > all_patients_corresponding_to_funsys_$PVALUE
+		echo -e  "$net_name\t$net_type\tpatient_overlaping_with_clusters_functional_coherent\t`sort -u all_patients_corresponding_to_funsys_$PVALUE | wc -l` " >> ../metrics
+
+
+
+				
+	done
+
+
+}
