@@ -13,15 +13,13 @@ Python 3
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``
-  
 **II** Install ruby.  
 **III** Install AutoFlow
 ``
 Code: gem install autoflow.  
 ``
-  
-**IV** Install NetAnalyser: [GitHub](https://github.com/ElenaRojano/NetAnalyzer). 
-**V** Install python 3 and import librarys: optparse, numpy, os.path. 
+**IV** Install NetAnalyser: [GitHub](https://github.com/ElenaRojano/NetAnalyzer).   
+**V** Install python 3 and import librarys: optparse, numpy, os.path.  
 **VI** Instal R and the following R packages: install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra')) and BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db")). 
 
 ## Defining PATHS. 
