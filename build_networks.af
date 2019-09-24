@@ -1,13 +1,20 @@
 build_phen_gene_network){
+	#GENERETES PHENOTYPE-GENE RELATIONS
+	# Load Python
 	module load python/anaconda-3_440
+	# Load R
 	source ~soft_bio_267/initializes/init_R
+	# Load Netanalyzer
 	source ~soft_bio_267/initializes/init_netanalyzer
+
+	#Path to scripts
 	PATH=$current_dir'/scripts/R_scripts':$PATH
 	PATH=$current_dir'/scripts/py_scripts':$PATH
 	export PATH
+	#NetAnalyser layers -> HPOs regions and patients
 	LAYERS='hpo,HP;regions,\.;patients,[0-9]'
 	?
-	NetAnalyzer.rb -i $net -l $LAYERS -m hypergeometric -u 'hpo,regions;patients' -a loci2phen.txt -N
+	NetAnalyzer.rb -i $net -l $LAYERS -m $metric_type -u 'hpo,regions;patients' -a loci2phen.txt -N
 	merge_by_cluster.rb -c $cluster_coords_enriched -n loci2phen.txt > loci2phen_coords.txt
 	awk '{if($5 >= "$association_thresold") print $0}' loci2phen_coords.txt > loci2phen_coords_filtered.txt 
 	awk '{print $4 "\t" $1 "\t" $2 "\t" $3}' loci2phen_coords_filtered.txt > phen2coords_filtered_sort.txt
@@ -21,16 +28,17 @@ build_phen_gene_network){
 }
 
 build_phen_phen_network){
+	#GENERETES PHENOTYPE-PHENOTYPE AND MORES-SPECIFIC PAIRS LIST
 	# Load netanalyzer
 	source ~soft_bio_267/initializes/init_netanalyzer
-	# Input data -> layer HPO have a code 'HP:' and patients code are numbers. We extract columns 1 and 2 of the sourcce file of DECIPHER
+	# NetAnalyzer layers -> HPO and patients
 	LAYERS='hpo,HP:;patients,[0-9]'
 	
 	?
-	#execute NetAnalyzer Without parental enrichment
+	#Execute NetAnalyzer Without parental enrichment
 	NetAnalyzer.rb -i $patient2hpo_unenriched -l $LAYERS -m $metric_type -u 'hpo;patients' -a phen2phen_net
 	
-	#extract HPO with an association index great than a threshold
+	#Extract HPO with an association index great than a threshold
 	awk '{if($3 >= $association_thresold) print $0}' phen2phen_net > more_spec_pairs_metric
 	cut -f 1,2 more_spec_pairs_metric > more_spec
 
@@ -41,25 +49,42 @@ build_phen_phen_network){
 	
 }
 
+generate_random_models_[links;nodes]){
+	#GENERATE MORE-SPECIFIC RANDOM MODELS
+	#initialize R
+	source ~soft_bio_267/initializes/init_R
+
+	name=`echo | awk '{if("(*)" == "links") print "more_spec_l_rdm"; else print "more_spec_n_rdm" }'`
+	mkdir random_models
+	for i in {1..$number_of_random_models}
+	do
+	?
+		#Create 2 random model (links/nodes) from the real pairs lists.
+		randomize_network.R -n build_phen_phen_network)/more_spec -o random_models/$name"_"$i -r (*)
+
+	done 
+}
 
 generate_less_spec_pairs){
+	#GENERATE LESS-SPECIFIC PAIR LISTS AND THEIR RANDOM MODELS
 	module load python/anaconda-3_440
 	source ~soft_bio_267/initializes/init_R
 	export PATH=$current_dir'scripts/py_scripts':$PATH
 	mkdir less_spec_pairs
 	mkdir random_less_spec_pairs
-	#extract HPO with an association index less than a threshold
+	#Extract HPO with an association index less than a threshold
 	awk '{if($3 < $association_low_thresold) print $0}' build_phen_phen_network)/phen2phen_net > less_specific_pairs
-	#establish the number of pairs of the real network
-	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
-	calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > all_hpo_prevalence
 	echo -e  "Number_of_less_specific_pairs\t`wc -l  less_specific_pairs | cut -d ' ' -f 1` " >> ../build_metrics
- 
+	#Establish the number of pairs to get
+	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
+	
+	
 	for i in {1..$number_of_random_models}
 	do
 	?
-   	#extract randomly the same number of pairs thatn in the previous network
+   		#Extract randomly the same number of pairs than in more_spec 
    		shuf -n $pair_number less_specific_pairs | cut -f 1,2 > less_spec_pairs/less_spec_$i
+   		#Create random models (links/nodes)
    		randomize_network.R -n less_spec_pairs/less_spec_$i -o random_less_spec_pairs/less_spec_n_rdm_$i -r nodes
    		randomize_network.R -n less_spec_pairs/less_spec_$i -o random_less_spec_pairs/less_spec_l_rdm_$i -r links
    			
@@ -67,21 +92,8 @@ generate_less_spec_pairs){
 
 }
 
-generate_random_models_[links;nodes]){
-	#initialize R
-	source ~soft_bio_267/initializes/init_R
-	name=`echo | awk '{if("(*)" == "links") print "more_spec_l_rdm"; else print "more_spec_n_rdm" }'`
-	mkdir random_models
-	for i in {1..$number_of_random_models}
-	do
-	?
-		#Create 2 random model from the real network.
-		randomize_network.R -n build_phen_phen_network)/more_spec -o random_models/$name"_"$i -r (*)
-
-	done 
-}
-
 generated_unconnected_pairs){
+	#GENERETES UNCONNECTED LISTS
 	module load python/anaconda-3_440	
 	export PATH=$current_dir'scripts/py_scripts':$PATH
 	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
@@ -96,7 +108,7 @@ generated_unconnected_pairs){
 }
 
 collect_all_networks){
-	#collecting all generated network in the same directory
+	#COLLECT ALL PAIRS LISTS IN THE SAME DIRECTORY
 	rm -rf working_networks
 	mkdir working_networks
 	?
@@ -109,15 +121,17 @@ collect_all_networks){
 }
 
 get_genes_for_each_term){
-	#get the unic nodes in the main network
+	#GET PHENOTYPE-GENE RELATIONS
+
+	#Get the unic nodes in the main network
 	cut -f 2 $patient2hpo_unenriched  | sort -u  > uniq_nodes
 	?
 	#HPO gene association
-	
 	grep -F -f uniq_nodes build_phen_gene_network)/phen2gene > term_gene_pairs
 }
 
 single_term_enrichment_analysis_[kegg;go;reactome]){
+	#SINGLE PHENOTYPE ENRICHMENT ANALYSIS
 	#Initialize R
 	source ~soft_bio_267/initializes/init_R
 
@@ -125,13 +139,14 @@ single_term_enrichment_analysis_[kegg;go;reactome]){
 	for PVALUE in $parsed_p_values
 	do
 		?
-		#Do an enrichment analysis if the single pairs in kegg, go, reactome
+		#Enrichment analysis Of the single phenotypes (kegg/go/reactome)
 		enrich_by_onto.R -p $PVALUE -e (*) -o enrich_(*)_single_$PVALUE -n get_genes_for_each_term)/term_gene_pairs
 	done
 	
 }
 
 collect_single_enrichment_analysis){
+	#COLLECT ENRICHMENT ANALYSIS RESULTS IN THE SAME DIRECTORY
 	rm -rf enrichments
 	mkdir enrichments
 	?
