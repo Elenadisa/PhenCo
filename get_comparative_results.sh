@@ -11,7 +11,7 @@ source ~soft_bio_267/initializes/init_R
 
 results_source=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks
 
-build_result_source=/mnt/scratch/users/bio_267_uma/elenads/test1/build_uneriched_nets
+build_results_source=/mnt/scratch/users/bio_267_uma/elenads/test1/build_uneriched_nets
 
 PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/rscripts:$PATH
 PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/py_scripts:$PATH
@@ -19,8 +19,7 @@ export PATH
 
 mkdir results
 cat processed_data/build_metrics $build_result_source/build_metrics > results/build_metrics
-cp $build_result_source"/NetAnalyzer.rb_0001/phen2phen_net"  results/phen2phen_net
-cp $build_result_source"/shuf_0000/all_hpo_prevalence"  results/all_hpo_prevalence
+cp $build_results_source"/NetAnalyzer.rb_0001/phen2phen_net"  results/phen2phen_net
 
 cat $results_source/*/metrics > results/all_metrics
 create_metric_table.rb results/all_metrics_renamed 'Name,Type' results/table_metrics.txt
