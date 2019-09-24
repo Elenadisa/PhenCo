@@ -6,7 +6,12 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 **III** Get results: obtain graphs and tables with results.  
 
 ## Requeriments
-Python 3
+
+* Python 3. 
+* R version R-3.3.1. 
+* Bioconductor 3.4 or higher. 
+* Markdown. 
+
 ### Instalation
 
 **I** Clone this repository.
