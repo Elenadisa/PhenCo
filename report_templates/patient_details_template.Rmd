@@ -22,11 +22,11 @@
            return(files)     
         }
    
-    group_cluster_information <- function(df1, df2){
-      clusters <- unique(df1$Patient)
-      all_clusters <- list()
+    group_patient_information <- function(df1, df2){
+      patients <- unique(df1$Patient)
+      all_patients <- list()
 
-      for (i in clusters){
+      for (i in patients){
         all_groups <- list()
         hp_groups <- filter(df1, Patient == i)
         if (nrow(hp_groups) != 0){
@@ -36,12 +36,29 @@
         system_groups <- filter(df2, Patient == i)
         if (nrow(system_groups) != 0){
           all_groups[["system"]] <- system_groups
+          phenotypes_vector_length <- c()
+          phenotypes <- list()
+          for(patient in 1:length(system_groups$Shared_hpos)){
+            phenotypes[patient] <- strsplit(system_groups$Shared_hpos[patient], ", ")
+            number_hpo <- strsplit(system_groups$Shared_hpos[patient], ", ")[[1]]
+            phenotypes_vector_length[patient] <- length(number_hpo)
+          }
+          unique_hpo_list <- unique(unlist(phenotypes))
+          all_groups[["phenotype_length"]] <- length(unique_hpo_list)
+          
+          systems_index <- with(system_groups, order(phenotypes_vector_length, decreasing = TRUE))
+          systems_groups_ordered <- system_groups[systems_index,]
+          rownames(systems_groups_ordered) <- NULL
+          all_groups[["system"]] <- systems_groups_ordered
+
+        }else{
+          all_groups[["phenotype_length"]] <- 0
         }
 
         name <- paste0("Patient_", i)
-        all_clusters[[name]] <- all_groups 
+        all_patients[[name]] <- all_groups 
         }
-        return(all_clusters)  
+        return(all_patients)  
     }
 
   produce_scatterplot <- function(data_set, x_axis, y_axis, x_lab, y_lab, add=FALSE){
@@ -152,18 +169,26 @@ kable(t(reactome_df))
   
   
                     
-all_clusters <- group_cluster_information(hpo, systems)
+all_patients <- group_patient_information(hpo, systems)
 
-for(i in 1:length(all_clusters)){
-    list <- all_clusters[[i]]
-    cluster_name <- names(all_clusters[i])
-    cat(cluster_name, "\n")
-    for(i in list){
-      print(knitr::kable(i, format="markdown"))
-      cat("\n")
+length_vector <- c()
+  for(i in 1:length(all_patients)){
+    list <- all_patients[[i]]
+    phenotype_length <- list["phenotype_length"]
+    length_vector[i] <- phenotype_length
     }
-  }
 
+ordered_patients <- all_patients[order(unlist(length_vector), decreasing=TRUE)]  
+
+for(i in 1:length(ordered_patients)){
+  list <- ordered_patients[[i]]
+  patient_name <- names(ordered_patients[i])
+  cat(patient_name, "\n")
+  for(i in list){
+    print(knitr::kable(i, format="markdown"))
+    cat("\n")
+  }
+}
 
     
 
