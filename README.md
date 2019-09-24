@@ -1,4 +1,4 @@
-# PhenCo
+# PhenCo Version 1.0
 
 PhenCo consists of a workflow with two templates, built in autoflow. This workflow analyse comorbidity relations of phenotype from patients of a cohort:  
 **I** Building networks: get the phenotype pairs lists from a cohort of patients.  
@@ -29,3 +29,4 @@ The templetes have to be executed in a certain order.
 **I** ./launch_build_networks.sh. 
 **II** ./launch_analyse_networks.sh. 
 **III** ./get_comparative_results.sh. 
+
