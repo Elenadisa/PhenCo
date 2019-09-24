@@ -8,6 +8,7 @@ module load python/anaconda-3_440
 PATH=$current_dir/'scripts/py_scripts':$PATH
 export PATH
 
+#DOWNLOAD EXTERNAL FILES 
 
 mkdir external_data
 
@@ -24,10 +25,9 @@ cut -f 2,3 external_data/mimTitles.txt | sed -e '/^#/d' > processed_data/omim_di
 
 
 
-# Patients info
+
 mkdir processed_data
 
-#INPUT FILE PATH
 # THE INPUT FILE MUST BE IN THE FORMAT XXX
 input_file_path=/PATH/TO/INPUT/FILE
 
@@ -82,7 +82,11 @@ create_hpo_dictionary.py -l processed_data/HPO_list -d external_data/hp.obo > pr
 cut -f 2  processed_data/patient2hpo_unenriched | sort -u  > processed_data/relevant_HPOs
 grep -Fwf processed_data/relevant_HPOs processed_data/HPO_table.txt > processed_data/filtered_HPO_table.txt
 
-#COMENTION
+#Calculate single HPO prevalence in DECIPHER patients
+mkdir results
+calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_prevalence
+
+#COMENTION ANALYSIS
 
 module unload libyaml
 module unload openssl
@@ -97,11 +101,10 @@ source ~soft_bio_267/initializes/init_autoflow
 
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
-mkdir $SCRATCH'/PhenCo'
-mkdir $SCRATCH'/PhenCo/build_nets'
+mkdir /PATH/TO/INPUT/FILE/PhenCo
+mkdir /PATH/TO/INPUT/FILE/PhenCo/build_nets
 
-# Prepare variables
-
+# PREPARE VARIABLES NEEDED IN THE FLUX
 
 #\\$p_values=0.05/0.001/0.00001
 
@@ -113,7 +116,6 @@ variables=`echo -e "
 	\\$association_thresold=2,
 	\\$association_low_thresold=2,
 	\\$metric_type=hypergeometric,
-	\\$real_net_prefix=hypergeometric,
 	\\$p_values=0.05,
 	\\$patient2hpo_unenriched=$current_dir'/processed_data/patient2hpo_unenriched',
 	\\$patient2hpo_enriched=$current_dir'/processed_data/patient2hpo_enriched',
