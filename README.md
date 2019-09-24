@@ -9,7 +9,7 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 Python 3
 ### Instalation
 
-**I** Clone this repository. > git clone https://github.com/Elenadisa/PhenCo
+**I** Clone this repository. >git clone https://github.com/Elenadisa/PhenCo
 **II** Install ruby.  
 **III** Install AutoFlow. Code: gem install autoflow.  
 **IV** Install NetAnalyser: [GitHub](https://github.com/ElenaRojano/NetAnalyzer). 
