@@ -50,7 +50,7 @@ get_table_ontology.rb external_data/hp.obo name,synonym | cut -f 1,2  > processe
 source ~soft_bio_267/initializes/init_pets
 
 
-# About enrichment
+# About parental enrichment
 #	-r 'none' => no enrichment, -r 'root' => enrichment
 node_character='A'
 get_network_nodes.rb -p external_data/hp.obo -e processed_data/list_of_hpo_to_exclude.txt -i processed_data/patient_data.txt -m $node_character -o processed_data/tripartite_network_unenriched.txt -c processed_data/cluster_coords_unenriched.txt -r 'none'
@@ -101,10 +101,10 @@ source ~soft_bio_267/initializes/init_autoflow
 
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
-mkdir /PATH/TO/INPUT/FILE/PhenCo
-mkdir /PATH/TO/INPUT/FILE/PhenCo/build_nets
+mkdir /PATH/TO/OUTPUT/FILES/PhenCo
+mkdir /PATH/TO/OUTPUT/FILES/PhenCo/build_nets
 
-# PREPARE VARIABLES NEEDED IN THE FLUX
+# PREPARE VARIABLES NEEDED IN build_networks.af
 
 #\\$p_values=0.05/0.001/0.00001
 
@@ -128,10 +128,10 @@ variables=`echo -e "
 " | tr -d [:space:]`
 
 
-#AutoFlow -w build_networks.af -o $SCRATCH'/PhenCo/build_nets' -V $variables -m 2gb $1 -n cal -t '10:00:00'
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_nets -V $variables -m 2gb $1 -n cal -t '10:00:00'
 
 #For enrichment analysis
-#AutoFlow -w build_networks.af -o $SCRATCH'/PhenCo/build_nets' -V $variables -m 16gb $1 -n cal -t '10:00:00'
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_nets -V $variables -m 16gb $1 -n cal -t '10:00:00'
 
 
 
