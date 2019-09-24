@@ -1,5 +1,5 @@
 build_phen_gene_network){
-	#GENERETES PHENOTYPE-GENE RELATIONS
+	#GENERATES PHENOTYPE-GENE RELATIONS
 	# Load Python
 	module load python/anaconda-3_440
 	# Load R
@@ -28,7 +28,7 @@ build_phen_gene_network){
 }
 
 build_phen_phen_network){
-	#GENERETES PHENOTYPE-PHENOTYPE AND MORES-SPECIFIC PAIRS LIST
+	#GENERATES PHENOTYPE-PHENOTYPE AND MORES-SPECIFIC PAIRS LIST
 	# Load netanalyzer
 	source ~soft_bio_267/initializes/init_netanalyzer
 	# NetAnalyzer layers -> HPO and patients
@@ -50,7 +50,7 @@ build_phen_phen_network){
 }
 
 generate_random_models_[links;nodes]){
-	#GENERATE MORE-SPECIFIC RANDOM MODELS
+	#GENERATES MORE-SPECIFIC RANDOM MODELS
 	#initialize R
 	source ~soft_bio_267/initializes/init_R
 
@@ -66,7 +66,7 @@ generate_random_models_[links;nodes]){
 }
 
 generate_less_spec_pairs){
-	#GENERATE LESS-SPECIFIC PAIR LISTS AND THEIR RANDOM MODELS
+	#GENERATES LESS-SPECIFIC PAIR LISTS AND THEIR RANDOM MODELS
 	module load python/anaconda-3_440
 	source ~soft_bio_267/initializes/init_R
 	export PATH=$current_dir'scripts/py_scripts':$PATH
@@ -93,9 +93,11 @@ generate_less_spec_pairs){
 }
 
 generated_unconnected_pairs){
-	#GENERETES UNCONNECTED LISTS
+	#GENERATES UNCONNECTED LISTS
+	#Load python
 	module load python/anaconda-3_440	
 	export PATH=$current_dir'scripts/py_scripts':$PATH
+	#Establis pairs numbers to get
 	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
 	mkdir random_models
 	?
@@ -103,6 +105,7 @@ generated_unconnected_pairs){
 	echo -e  "Number_of_unconnected_pairs\t`wc -l  unconnected_phen| cut -d ' ' -f 1` " >> ../build_metrics
 	for i in {1..$number_of_random_models}
 	do
+		#Extract randomly the same number of pairs than in more_spec 
 		shuf -n $pair_number unconnected_phen > random_models/unconnected_$i
 	done
 }
