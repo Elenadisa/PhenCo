@@ -8,10 +8,11 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 ## Requeriments
 
 * Python 3. 
+* Ruby 2.4.1. 
 * R version 3.3.1 or higher. 
 * Bioconductor 3.4 or higher. 
-* Markdown.
-* Ruby 2.4.1. 
+* R Markdown. 
+
 
 ### Instalation
 
@@ -19,19 +20,23 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``.   
-**II** Install [ruby](https://www.ruby-lang.org/en/downloads/).  
+**II** Install [Ruby](https://www.ruby-lang.org/en/downloads/).  
 **III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
 **IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
-**V** Install [Python 3](https://www.python.org/downloads/) and import librarys: optparse, numpy, os.path.  
+**V** Install [Python 3](https://www.python.org/downloads/) and import librarys
+``
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+pip3 install optparse-pretty numpy os.path2
+``   
 **VI** Instal [R](https://cloud.r-project.org/) and the following R packages:  
 ``
-install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra'))   
+install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra', 'rmarkdown'))  
 ``
-  
 ``
-BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db")).  
+BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))  
 `` 
-   
+
 ## Defining PATHS. 
 
 **I** In launch_build_networks.sh introduce the path to the input data.  
