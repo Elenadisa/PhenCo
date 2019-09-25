@@ -92,8 +92,8 @@ The output of this part of the workflow are different html reports with the resu
 
 ### Execution
 
-The templetes have to be executed in a certain order.  
-**I** ./launch_build_networks.sh. 
-**II** ./launch_analyse_networks.sh. 
-**III** ./get_comparative_results.sh. 
+The templetes have to be executed in a certain order.    
+**I** ./launch_build_networks.sh.   
+**II** ./launch_analyse_networks.sh.   
+**III** ./get_comparative_results.sh.   
 
