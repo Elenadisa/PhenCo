@@ -71,8 +71,9 @@ User need to define data output path in
 /PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks
 ``
 line of launch_analyse_networks.sh. 
-**get_comparative_results.sh**. 
-*Input*. 
+
+**III get_comparative_results.sh**.   
+*Input*.   
 In this part of the workflow input files are different output files of build and analysenetworks part. User need to define paths for analyse networks results in 
 ``
 results_source=PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks 
@@ -85,8 +86,8 @@ Markdown template to generate html reports are available in
 ``
 report_template
 ``
- directory.
-*Output*
+ directory.  
+*Output*.   
 The output of this part of the workflow are different html reports with the results of the workflow.
 
 ### Execution
