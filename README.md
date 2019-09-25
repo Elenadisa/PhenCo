@@ -79,7 +79,11 @@ and for build networks results in
 ``
 *build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks*.  
 ``
-Markdown template to generate html reports are available in reports_template directory.
+Markdown template to generate html reports are available in 
+``
+reports_template
+``
+ directory.
 *Output*
 The output of this part of the workflow are different html reports with the results of the workflow.
 
