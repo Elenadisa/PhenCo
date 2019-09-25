@@ -1,3 +1,5 @@
+# Report 6: Patient Details
+  
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   metric_table <- data[['more-spec_table_metrics.txt']]
   library(dplyr)
@@ -125,13 +127,13 @@ kable(t(reactome_df))
 
 ```
 
-## Number of cluster vs Number of HPO per patient  
+## Number of cluster vs number of HPO per patient  
 
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   
   all_data_table <- load_files(metric_table, 'Type', 'patients_systems_cases', TRUE)
-  produce_scatterplot(all_data_table, "Prof_length", "Nº_coincedence_clusters", "Number of HPO per patient", "Number of Clusters", add=TRUE)
+  produce_scatterplot(all_data_table, "Prof_length", "Nº_coincedence_clusters", "Number of HPO per patient", "Number of clusters", add=TRUE)
 
 ```
 
@@ -139,7 +141,7 @@ kable(t(reactome_df))
 
 
 
-## Patient Data
+## Patient data
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
   library(kableExtra)

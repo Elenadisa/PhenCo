@@ -1,4 +1,5 @@
-## Report of Comorbidity Proyect Clustering Analysis 
+# Report 2: Clustering Report
+  
 ```{r  warning=TRUE, error=TRUE}
 	metric_table <- data[['table_metrics.txt']]
 	produce_barplot <- function( column, title, ylab, second_column=NULL, add=FALSE){
@@ -66,15 +67,15 @@
         return(plt)
     }
 ```
-To do this clustering analysis, we select those HPO pairs which have consistent or emergent pathways in KEGG, REACTOME or GO enrichment. Once we have done this selection, we performed a cluster analysis with these HPO pairs, thanks to the R package Linkcomm.   
+To do this clustering analysis, we select those HPO pairs which have consistent or emergent pathways in KEGG, Reactome or GO enrichment. Once we have done this selection, we performed a cluster analysis with these HPO pairs, thanks to the R package Linkcomm.   
 
 
 
-# KEGG Enrichment  
+# KEGG enrichment  
 
  
 
-### KEGG Cluster Analysis Summary
+### KEGG cluster analysis summary
 
 **Image 1: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0000/summary_dendograme_kegg_0.05.png)  
 
@@ -89,60 +90,60 @@ To do this clustering analysis, we select those HPO pairs which have consistent 
 ```{r  echo=FALSE, echo=FALSE, warning=FALSE, message=FALSE, message=FALSE }
 	grid.arrange(
 		produce_barplot("Average_Cluster_size_kegg_0.05", "", "Clst mean size", add=TRUE),
-		produce_barplot("clusters_number_kegg_0.05", "", "Number of Clusters"),
+		produce_barplot("clusters_number_kegg_0.05", "", "Number of clusters"),
 		heights = c(1/5, 4/5)
 	)
 ```		
   
-**Figure X**: (**Top**) ***Clusters Size Average for KEGG analysis***. (**Bottom**) ***Number of Clusters for KEGG analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks. 
+**Figure 5**: (**Top**) ***Clusters size average for KEGG analysis***. (**Bottom**) ***Number of clusters for KEGG analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks. 
 
 
   
-### KEGG: Number of Clusters which fits with an OMIM Disease  
+### KEGG: Number of clusters which fits with an OMIM diseases  
 
 ```{r  echo=FALSE, echo=FALSE, warning=FALSE, message=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("omim_diseases_in_clusters_kegg_0.05", "", "OMIM ids", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_kegg_0.05", "", "OMIM ids", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_kegg_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_kegg_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_kegg_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_kegg_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***.  High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
+**Figure 6**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***.  High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
   
 
 
-### KEGG: Number of Clusters which fits with an ORPHA Disease
+### KEGG: Number of clusters which fits with an Orphanet diseases
 
 ```{r  echo=FALSE, echo=FALSE, warning=FALSE, message=FALSE, message=FALSE}
         grid.arrange(
-                produce_barplot("orpha_diseases_in_clusters_kegg_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("orpha_diseases_in_clusters_missing_1_kegg_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_kegg_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_kegg_0.05", "", "Number of Clusters"),
+                produce_barplot("orpha_diseases_in_clusters_kegg_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("orpha_diseases_in_clusters_missing_1_kegg_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("clusters_with_orpha_diseases_kegg_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_kegg_0.05", "", "Number of clusters"),
 		ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-		top= " Full match / one missing hpo "
+		top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***. (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***. 
+**Figure 7**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***. (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***. 
 
 
 
-### KEGG: Number of clusters which at least 70% of HPOs share one or more kegg pathway  
+### KEGG: Number of clusters which at least 70% of HPOs share one or more KEGG pathway  
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
     
-    produce_barplot("clusters_enrich_70_percent_kegg_0.05", "Number Clusters with kegg enrichment", "Number of Clusters")
+    produce_barplot("clusters_enrich_70_percent_kegg_0.05", "Number clusters with KEGG enrichment", "Number of clusters")
 
 ```
 
-**Figure X**: ***Number of clusters in which all their HPOs shared the same KEGG pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
+**Figure 8**: ***Number of clusters in which all their HPOs shared the same KEGG pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
 
 
 ### KEGG: Enriched clusters 70% of HPO coincidence with OMIM diseases 
@@ -150,50 +151,51 @@ To do this clustering analysis, we select those HPO pairs which have consistent 
         grid.arrange(
                 produce_barplot("omim_diseases_enrich_70_percent_kegg_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_enrich_70_percent_kegg_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_kegg_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_kegg_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_kegg_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_kegg_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common KEGG enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
+**Figure 9**: For those clusters which have common KEGG enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
 
 
 
 
-### KEGG: Enriched clusters 70% of HPO coincidence with ORPHA diseases
+### KEGG: Enriched clusters 70% of HPO coincidence with Orphanet diseases
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("orpha_diseases_enrich_70_percent_kegg_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("orpha_diseases_in_clusters_missing_1_enrich_70_percent_kegg_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_kegg_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_kegg_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_kegg_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_kegg_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common KEGG enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
+**Figure 10**: For those clusters which have common KEGG enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
 
 
 
-### Summary table of KEGG Cluster Analysis 70% HPO
+### Summary table of KEGG cluster analysis 70% HPO
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
-kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_number_kegg_0.05), Average_Cluster_size = mean(Average_Cluster_size_kegg_0.05), Cluster_omim_overlap= mean(clusters_with_omim_diseases_missing_1_kegg_0.05), Cluster_orpha_overlap= mean(clusters_with_orpha_diseases_missing_1_kegg_0.05), Clusters_functional_coherent_kegg = mean(clusters_enrich_70_percent_kegg_0.05), Clusters_functional_coherent_kegg_omim_overlap = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_kegg_0.05), Clusters_functional_coherent_kegg_orpha_overlap = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_kegg_0.05)))
+kable(ddply(metric_table, .(Type), summarize, "Clusters number" = mean(clusters_number_kegg_0.05), "Average cluster size" = mean(Average_Cluster_size_kegg_0.05), "Cluster OMIM overlap"= mean(clusters_with_omim_diseases_missing_1_kegg_0.05), "Cluster Orphanet overlap"= mean(clusters_with_orpha_diseases_missing_1_kegg_0.05), "Clusters functional coherent KEGG" = mean(clusters_enrich_70_percent_kegg_0.05), "Clusters functional coherent KEGG-OMIM overlap" = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_kegg_0.05), "Clusters functional coherent KEGG-Orphanet overlap" = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_kegg_0.05)))
 
 ```
+  
+**Table 1**: Summary table of KEGG cluster analysis 70% HPO
 
 
+## Reactome enrichment
 
-## Reactome Enrichment
 
-
-## Reactome Cluster Analysis Summary  
+## Reactome cluster analysis summary  
 
 **Image 4: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0002/summary_dendograme_reactome_0.05.png)  
 
@@ -203,119 +205,120 @@ kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_nu
   
 
 
-### REACTOME: Number of clusters and size
+### Reactome: Number of clusters and size
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE }
 	grid.arrange(
 		produce_barplot("Average_Cluster_size_reactome_0.05", "", "Clst mean size", add=TRUE),
-		produce_barplot("clusters_number_reactome_0.05", "", "Number of Clusters"),
+		produce_barplot("clusters_number_reactome_0.05", "", "Number of clusters"),
 		heights = c(1/5, 4/5)
 	)
 ```
   
-**Figure X**: (**Top**) ***Clusters Size Average for Reactome analysis***. (**Bottom**) ***Number of Clusters for Reactome analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks.
+**Figure 11**: (**Top**) ***Clusters size average for Reactome analysis***. (**Bottom**) ***Number of clusters for Reactome analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks.
 
 
 
 
-### REACTOME: Number of Clusters which fits with an OMIM Disease  
+### Reactome: Number of clusters which fits with an OMIM diseases  
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("omim_diseases_in_clusters_reactome_0.05", "", "OMIM ids", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_reactome_0.05", "", "OMIM ids", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_reactome_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_reactome_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_reactome_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_reactome_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
+**Figure 12**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
 
 
 
-### REACTOME: Number of Clusters which fits with an ORPHA Disease  
+### Reactome: Number of clusters which fits with an Orphanet diseases  
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
-                produce_barplot("orpha_diseases_in_clusters_reactome_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("orpha_diseases_in_clusters_missing_1_reactome_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_reactome_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_reactome_0.05", "", "Number of Clusters"),
+                produce_barplot("orpha_diseases_in_clusters_reactome_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("orpha_diseases_in_clusters_missing_1_reactome_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("clusters_with_orpha_diseases_reactome_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_reactome_0.05", "", "Number of clusters"),
 		ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-		top= " Full match / one missing hpo "
+		top= " Full match / One missing hpo "
         )
 ```
   
-  **Figure X**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
+  **Figure 13**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
 
 
 
 
-### REACTOME: Number of clusters which at least 70% of HPOs share one or more reactome pathway  
+### Reactome: Number of clusters which at least 70% of HPOs share one or more Reactome pathway  
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
     
-    produce_barplot("clusters_enrich_70_percent_reactome_0.05", "Number Clusters with reactome enrichment", "Number of Clusters")
+    produce_barplot("clusters_enrich_70_percent_reactome_0.05", "Number clusters with Reactome enrichment", "Number of clusters")
 
 ```
 
-**Figure X**: ***Number of clusters in which all their HPOs shared the same REACTOME pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
+**Figure 14**: ***Number of clusters in which all their HPOs shared the same Reactome pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
 
 
-### REACTOME: Enriched clusters 70% of HPO coincidence with OMIM diseases 
+### Reactome: Enriched clusters 70% of HPO coincidence with OMIM diseases 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("omim_diseases_enrich_70_percent_reactome_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_enrich_70_percent_reactome_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_reactome_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_reactome_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_reactome_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_reactome_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common REACTOME enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
+**Figure 15**: For those clusters which have common Reactome enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
 
 
 
-### REACTOME: Enriched clusters 70% of HPO coincidence with ORPHA diseases
+### Reactome: Enriched clusters 70% of HPO coincidence with Orphanet diseases
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("orpha_diseases_enrich_70_percent_reactome_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("orpha_diseases_in_clusters_missing_1_enrich_70_percent_reactome_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_reactome_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_reactome_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_reactome_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_reactome_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common REACTOME enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
+**Figure 16**: For those clusters which have common Reactome enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
 
 
-### Summary table of REACTOME Cluster Analysis 70% HPO
+### Summary table of Reactome cluster analysis 70% HPO
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
-kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_number_reactome_0.05), Average_Cluster_size = mean(Average_Cluster_size_reactome_0.05), Cluster_omim_overlap = mean(clusters_with_omim_diseases_missing_1_reactome_0.05), Cluster_orpha_overlap = mean(clusters_with_orpha_diseases_missing_1_reactome_0.05), Clusters_functional_coherent_reactome = mean(clusters_enrich_70_percent_reactome_0.05),  Clusters_functional_coherent_reactome_omim_overlap = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_reactome_0.05), Clusters_functional_coherent_reactome_orpha_overlap = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_reactome_0.05)))
+kable(ddply(metric_table, .(Type), summarize, "Clusters number" = mean(clusters_number_reactome_0.05), "Average cluster size" = mean(Average_Cluster_size_reactome_0.05), "Cluster OMIM overlap" = mean(clusters_with_omim_diseases_missing_1_reactome_0.05), "Cluster Orphanet overlap" = mean(clusters_with_orpha_diseases_missing_1_reactome_0.05), "Clusters functional coherent Reactome" = mean(clusters_enrich_70_percent_reactome_0.05),  "Clusters functional coherent Reactome-OMIM overlap" = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_reactome_0.05), "Clusters functional coherent Reactome Orphanet overlap" = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_reactome_0.05)))
 
 ```
+  
+**Table 2**: Summary table of Reactome cluster analysis 70% HPO
 
 
 
 
-
-## GO Enrichment  
-
+## GO enrichment  
 
 
-## GO Cluster Analysis Summary
+
+## GO cluster analysis summary
 
 **Image 7: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0001/summary_dendograme_go_0.05.png)  
 
@@ -331,60 +334,60 @@ kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_nu
 ```{r  echo=FALSE, warning=FALSE, message=FALSE }
         grid.arrange(
                 produce_barplot("Average_Cluster_size_go_0.05", "", "Clst mean size", add=TRUE),
-                produce_barplot("clusters_number_go_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_number_go_0.05", "", "Number of clusters"),
                 heights = c(1/5, 4/5)
         )
 ```
   
-**Figure X**: (**Top**) ***Clusters Size Average for GO analysis***. (**Bottom**) ***Number of Clusters for GO analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks.
+**Figure 17**: (**Top**) ***Clusters size average for GO analysis***. (**Bottom**) ***Number of clusters for GO analysis***. The average size of clusters is very similar in all networks. However, the number of clusters varys. However, the number of clusters varies between real and random networks, being this greater in real networks.
 
 
 
-### GO: Number of Clusters which fits with an OMIM Disease  
+### GO: Number of clusters which fits with an OMIM diseases  
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("omim_diseases_in_clusters_go_0.05", "", "OMIM ids", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_go_0.05", "", "OMIM ids", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_go_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_go_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_go_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_go_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
+**Figure 18**: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease.
 
 
 
-### GO: Number of Clusters which fits with an ORPHA Disease  
+### GO: Number of clusters which fits with an Orphanet diseases  
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
-                produce_barplot("orpha_diseases_in_clusters_go_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("orpha_diseases_in_clusters_missing_1_go_0.05", "", "ORPHA ids", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_go_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_go_0.05", "", "Number of Clusters"),
+                produce_barplot("orpha_diseases_in_clusters_go_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("orpha_diseases_in_clusters_missing_1_go_0.05", "", "Orphanet ids", add=TRUE),
+                produce_barplot("clusters_with_orpha_diseases_go_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_go_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
+**Figure 1**: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
 
 
 
-### GO: Number of clusters which at least 70% of HPOs share one or more go pathway  
+### GO: Number of clusters which at least 70% of HPOs share one or more GO pathway  
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
     
-    produce_barplot("clusters_enrich_70_percent_go_0.05", "Number Clusters with go enrichment", "Number of Clusters")
+    produce_barplot("clusters_enrich_70_percent_go_0.05", "Number clusters with GO enrichment", "Number of clusters")
 
 ```
 
-**Figure X**: ***Number of clusters in which all their HPOs shared the same KEGG pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
+**Figure 2**: ***Number of clusters in which all their HPOs shared the same GO pathway***. The number of clusters in which all its HPO are enriched in the same funtional system is higher in real networks comparing to random models. 
 
 
 ### GO: Enriched clusters 70% of HPO coincidence with OMIM diseases 
@@ -392,42 +395,42 @@ kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_nu
         grid.arrange(
                 produce_barplot("omim_diseases_enrich_70_percent_go_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("omim_diseases_in_clusters_missing_1_enrich_70_percent_go_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_go_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_go_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_omim_diseases_enrich_70_percent_go_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_go_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common GO enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
+**Figure 3**: For those clusters which have common GO enrichment: (**Top-Left**) ***Number of different OMIM diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different OMIM diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with OMIM diseases***.  (**Botton-Left**) ***Number of clusters that match with OMIM diseases except from one phenotype***. High-confidence clusters have more clusters that match with OMIM diseases and those clusters coincide with more than one disease comparing with Low-confidece and with the it random models. The number of clusters and diseases increase when we allow a cluster match failure with respect to the disease. 
 
 
 
-### GO: Enriched clusters 70% of HPO coincidence with ORPHA diseases
+### GO: Enriched clusters 70% of HPO coincidence with Orphanet diseases
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
         grid.arrange(
                 produce_barplot("orpha_diseases_enrich_70_percent_go_0.05", "", "Nº diseases", add=TRUE),
                 produce_barplot("orpha_diseases_in_clusters_missing_1_enrich_70_percent_go_0.05", "", "Nº diseases", add=TRUE),
-                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_go_0.05", "", "Number of Clusters"),
-                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_go_0.05", "", "Number of Clusters"),
+                produce_barplot("clusters_with_orpha_diseases_enrich_70_percent_go_0.05", "", "Number of clusters"),
+                produce_barplot("clusters_with_orpha_diseases_missing_1_enrich_70_percent_go_0.05", "", "Number of clusters"),
                 ncol = 2, nrow = 2,
                 heights = c(1/5, 4/5),
-                top= " Full match / one missing hpo "
+                top= " Full match / One missing hpo "
         )
 ```
   
-**Figure X**: For those clusters which have common GO enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
+**Figure 4**: For those clusters which have common GO enrichment: (**Top-Left**) ***Number of different Orphanet diseases that have a perfect match with clusters***. (**Top-Right**) ***Number of different Orphanet diseases that match with clusters except from one phenotype***. (**Botton-Left**) ***Number of clusters that have a perfect match with Orphanet diseases***.  (**Botton-Left**) ***Number of clusters that match with Orphanet diseases except from one phenotype***.
 
 
 
-### Summary table of GO Cluster Analysis 70% HPO
+### Summary table of GO cluster analysis 70% HPO
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
-kable(ddply(metric_table, .(Type), summarize, Clusters_number = mean(clusters_number_go_0.05), Average_Cluster_size = mean(Average_Cluster_size_go_0.05), Cluster_omim_overlap = mean(clusters_with_omim_diseases_missing_1_go_0.05), Cluster_orpha_overlap = mean(clusters_with_orpha_diseases_missing_1_go_0.05), Clusters_functional_coherent_go = mean(clusters_enrich_70_percent_go_0.05), Clusters_functional_coherent_go_omim_overlap = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_go_0.05), Clusters_functional_coherent_go_orpha_overlap = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_go_0.05)))
+kable(ddply(metric_table, .(Type), summarize, "Clusters number" = mean(clusters_number_go_0.05), "Average cluster size" = mean(Average_Cluster_size_go_0.05), "Cluster OMIM overlap" = mean(clusters_with_omim_diseases_missing_1_go_0.05), "Cluster Orphanet overlap" = mean(clusters_with_orpha_diseases_missing_1_go_0.05), "Clusters functional coherent GO" = mean(clusters_enrich_70_percent_go_0.05), "Clusters functional coherent GO-OMIM overlap" = mean(clusters_with_omim_diseases_missing_1_enrich_70_percent_go_0.05), "Clusters functional coherent GO-Prphanet overlap" = mean(clusters_with_orpha_diseases_missing_1_enrich_70_percent_go_0.05)))
 
 ```
 
-
+**Table 3**: Summary table of GO cluster analysis 70% HPO
 

@@ -1,4 +1,4 @@
-# Report of Comorbidity Project Pairs analysis
+# Report 1: Pairs Report
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   metric_table <- data[['table_metrics.txt']]
@@ -212,11 +212,11 @@ We have built different networks:
 **6. unconnected**: Random selection of HPO pairs that are not connected by any patient in DECIPHER database (negative control). 
 
 
-### Properties of the Phenotype-Phenotype pairs lists and random models
+### Properties of the phenotype-phenotype pairs lists and random models
 
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
-  build_metric_table <- read.table("results/build_metrics", sep="\t", header = FALSE)
+  build_metric_table <- read.table("../results/build_metrics", sep="\t", header = FALSE)
   colnames(build_metric_table) <- c("Metric", "Value")
   kable(build_metric_table)
 ```
@@ -227,22 +227,22 @@ We have built different networks:
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
 
-hyi_data <- read.table("results/phen2phen_net", header=FALSE)
+hyi_data <- read.table("../results/phen2phen_net", header=FALSE)
 colnames(hyi_data) <- c("HPO-A", "HPO-B", "HyI")
-HyI_distribution_plot(hyi_data, "HyI",log = FALSE, "Hypergeometric Index", "Hypergeometric Index Distribution")
+HyI_distribution_plot(hyi_data, "HyI",log = FALSE, "Hypergeometric index", "Hypergeometric index distribution")
 
-single_prevalence_data <- read.table("results/all_hpo_prevalence", header=FALSE)
-hpo_prevalence_graph(single_prevalence_data, "Phenotype Prevalence in DECIPHER", "Prevalence (%)")
+single_prevalence_data <- read.table("../results/all_hpo_prevalence", header=FALSE)
+hpo_prevalence_graph(single_prevalence_data, "Phenotype prevalence in DECIPHER", "Prevalence (%)")
 
 
 prevalence_pairs_data <- load_files(metric_table, "Type", "decipher_pairs_prevalence", header=FALSE)
-pairs_prevalence_graph(prevalence_pairs_data, "Phenotype Pairs Prevalence in DECIPHER", log = TRUE, "Mean Prevalence (%)")
+pairs_prevalence_graph(prevalence_pairs_data, "Phenotype pairs prevalence in DECIPHER", log = TRUE, "Mean prevalence (%)")
   
 
 
 ```
   
-**Figure 1**: Properties of the Phenotype-Phenotype pairs  
+**Figure 1**: Properties of the phenotype-phenotype pairs  
 
 
 ### Number of genes mapping to each phenotype pair
@@ -256,7 +256,7 @@ pairs_prevalence_graph(prevalence_pairs_data, "Phenotype Pairs Prevalence in DEC
 
 ```
 
-### Topological Analysis
+### Topological analysis
 
 #### MEANS
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
@@ -279,16 +279,16 @@ pairs_prevalence_graph(prevalence_pairs_data, "Phenotype Pairs Prevalence in DEC
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   grid.arrange(  
-    produce_barplot("confirmed_pairs_OMIM_cut_1", "At least one Disease", "Pairs", add=TRUE),
-    produce_barplot("confirmed_pairs_ORPHA_cut_1", "At least one Disease", "Pairs", add=TRUE),
-    produce_barplot("confirmed_pairs_OMIM_cut_2", "At least two Diseases", "Pairs", add=TRUE),
-    produce_barplot("confirmed_pairs_ORPHA_cut_2", "At least two Diseases", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_OMIM_cut_1", "At least one disease", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_ORPHA_cut_1", "At least one disease", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_OMIM_cut_2", "At least two diseases", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_ORPHA_cut_2", "At least two diseases", "Pairs", add=TRUE),
     ncol= 2, nrow = 2,
-    top = "OMIM / ORPHANET"
+    top = "OMIM / Orphanet"
   )
   grid.arrange(  
-    produce_barplot("confirmed_pairs_OMIM_cut_3", "At least three Diseases", "Pairs"),
-    produce_barplot("confirmed_pairs_ORPHA_cut_3", "At least three Diseases", "Pairs"),
+    produce_barplot("confirmed_pairs_OMIM_cut_3", "At least three diseases", "Pairs"),
+    produce_barplot("confirmed_pairs_ORPHA_cut_3", "At least three diseases", "Pairs"),
     ncol= 2
   )
 ```
@@ -297,14 +297,14 @@ pairs_prevalence_graph(prevalence_pairs_data, "Phenotype Pairs Prevalence in DEC
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   metric_table <- data[['table_metrics.txt']]
-  kable(ddply(metric_table, .(Type), summarize, confirmed_pairs_OMIM= mean(confirmed_pairs_OMIM_cut_3), confirmed_pairs_ORPHA= mean(confirmed_pairs_ORPHA_cut_3), Union_Diseases = mean(Union_Diseases_cut_3), Intersection_Diseases = mean(Intersection_Diseases_cut_3)))  
+  kable(ddply(metric_table, .(Type), summarize, "Confirmed pairs OMIM"= mean(confirmed_pairs_OMIM_cut_3), "Confirmed pairs Orphanet"= mean(confirmed_pairs_ORPHA_cut_3), "Union diseases" = mean(Union_Diseases_cut_3), "Intersection diseases" = mean(Intersection_Diseases_cut_3)))  
 
 ```
   
 **Table 3**: Overlap with diseases summary. 
   
 
-## Comention Analysis.
+## Comention analysis.
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -319,35 +319,35 @@ produce_density_plot(comention_suitable, "Pvalue", "Net_name", "Net_type", x_sca
 **Figure 3**: Comention pvalue density plot.
   
 
-## PMID per Pairs list.
+## PMID per pairs list.
   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
 
 pmid_data <- load_comention_files(metric_table, 'Type', 'pmid_analysis', FALSE, c("HPOA", "HPOB", "Union_PMID", "Net_type", "Net_name", "groups"), "more_spec", "less_spec", "unconnected")   
 pmid_suitable <- subset(pmid_data, Net_type %in% c("more_spec", "more_spec_l_rdm", "less_spec", "less_spec_l_rdm"))
 
-kable(ddply(pmid_suitable, .(Net_type), summarize, Union_PMID_mean= mean(Union_PMID), Union_PMID_sd= sd(Union_PMID), Union_PMID_median = median(Union_PMID), Union_PMID_IQR = IQR(Union_PMID))) 
+kable(ddply(pmid_suitable, .(Net_type), summarize, "Union PMID mean"= mean(Union_PMID), "Union PMID sd"= sd(Union_PMID), "Union PMID median" = median(Union_PMID), "Union PMID IQR" = IQR(Union_PMID))) 
 ```
   
 **Table 4**: Union PMID metrics per network type.
   
 
 
-### Emergent and Consistent functional systems
+### Emergent and Ccnsistent functional systems
   
 #### KEGG   
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   produce_barplot("hpo_pairs_with_at_least_1term_kegg_0.05", "Pairs number with KEGG enrichment", "Pairs", add=FALSE)
 
   grid.arrange(
-    produce_stacked_barplot("Type", "pairs_with_consistent_terms_kegg_0.05", "pairs_with_emergent_terms_kegg_0.05", "Pairs Consistent/emergent pathways", "Pairs", add = TRUE),
-    produce_stacked_barplot("Type", "consistent_enriched_terms_kegg_0.05", "emergent_enriched_terms_kegg_0.05", "Consistent/Emergent pathways", "Pathways", add=FALSE),
-    ncol=3
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_kegg_0.05", "pairs_with_emergent_terms_kegg_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_kegg_0.05", "emergent_enriched_terms_kegg_0.05", " ", "Pathways", add=FALSE),
+    ncol=2
   )
   
 ```
   
-**Figure 4**: KEGG Enrichment Analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of Consistent/Emergent Pathways. **Bottom right**: Number of Pairs with Consistent/Emergent Pathways.    
+**Figure 4**: KEGG enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of pairs with consistent/emergent pathways.    
   
 
 #### Mean
@@ -364,20 +364,20 @@ kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term KE
 
 **Table 5**: Summary of KEGG functional analysis
   
-#### REACTOME
+#### Reactome
 
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
-  produce_barplot("hpo_pairs_with_at_least_1term_reactome_0.05", "Pairs number with REACTOME enrichment", "Pairs", add=FALSE)
+  produce_barplot("hpo_pairs_with_at_least_1term_reactome_0.05", "Pairs number with Reactome enrichment", "Pairs", add=FALSE)
   
   grid.arrange(
-    produce_stacked_barplot("Type", "pairs_with_consistent_terms_reactome_0.05", "pairs_with_emergent_terms_reactome_0.05", "Pairs Consistent/emergent pathways", "Pairs", add = TRUE),
-    produce_stacked_barplot("Type", "consistent_enriched_terms_reactome_0.05", "emergent_enriched_terms_reactome_0.05", "Consistent/Emergent pathways", "Pathways", add=FALSE),
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_reactome_0.05", "pairs_with_emergent_terms_reactome_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_reactome_0.05", "emergent_enriched_terms_reactome_0.05", " ", "Pathways", add=FALSE),
     ncol=2
   )
   
 ```  
   
-**Figure 5**: Reactome Enrichment Analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of Consistent/Emergent Pathways. **Bottom right**: Number of Pairs with Consistent/Emergent Pathways.
+**Figure 5**: Reactome enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of Pairs with consistent/emergent pathways.
   
 #### Mean
   
@@ -399,14 +399,14 @@ kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term Re
   produce_barplot("hpo_pairs_with_at_least_1term_go_0.05", "Pairs number with GO enrichment", "Pairs", add=FALSE)
   
   grid.arrange(
-    produce_stacked_barplot("Type", "pairs_with_consistent_terms_go_0.05", "pairs_with_emergent_terms_go_0.05", "Pairs Consistent/emergent pathways", "Pairs", add = TRUE),
-    produce_stacked_barplot("Type", "consistent_enriched_terms_go_0.05", "emergent_enriched_terms_go_0.05", "Consistent/Emergent Pathways", "Pathways", add=FALSE),
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_go_0.05", "pairs_with_emergent_terms_go_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_go_0.05", "emergent_enriched_terms_go_0.05", " ", "Pathways", add=FALSE),
     ncol=2  
   )
   
 ```
   
-**Figure 6**: GO Enrichment Analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of Consistent/Emergent Pathways. **Bottom right**: Number of Pairs with Consistent/Emergent Pathways.
+**Figure 6**: GO enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of pairs with consistent/emergent Pathways.
   
 #### Mean
 

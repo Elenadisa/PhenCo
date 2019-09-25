@@ -1,3 +1,5 @@
+# Report 5: Cluster Details for Reactome coherent clusters
+  
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   metric_table <- data[['more-spec_table_metrics.txt']]
   library(dplyr)
