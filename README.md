@@ -12,17 +12,17 @@
 
 ### Instalation
 
-**I** Clone this repository.  
+**I** Clone this repository:
 ``
 git clone https://github.com/Elenadisa/PhenCo
-``.   
+``   
 **II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
 **III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
 **IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
 **V** Install [Python 3](https://www.python.org/downloads/) and install the following librarys:
 ``
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python3 get-pip.py
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py 
+python3 get-pip.py 
 pip3 install optparse-pretty numpy os.path2
 ``   
 **VI** Instal [R](https://cloud.r-project.org/) and the following R packages:  
