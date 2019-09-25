@@ -41,16 +41,17 @@ BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))
 
 ### Defining input/output paths. 
 
-User have to define input/output paths in launch scripts:
+User have to define input/output paths in launch scripts:  
+
 **I launch_build_networks.sh**. 
-*Input*. 
+*Input*.   
 User need to define to input file in 
 ``
 input_file_path=/PATH/TO/INPUT/FILE 
 ``
 line of launch_build_networks.sh. 
 Input file must be in XX format.  
-*Output*. 
+*Output*.   
 User need to define data output path in 
 ``
 /PATH/TO/OUTPUT/FILES/PhenCo 
@@ -63,7 +64,7 @@ In this part of the workflow input files are different output files of build net
 data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_nets* in launch_analyse_network.sh
 ``
  all needed files are accesibles.  
-*Output*. 
+*Output*.   
 User need to define data output path in 
 ``
 /PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks
