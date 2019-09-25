@@ -79,6 +79,7 @@
 
       plt <- plt + xlab(x_lab)
       plt <- plt + ylab(y_lab)
+      plt <- plt + theme(legend.title=element_blank())
 
       return(plt)
     }
