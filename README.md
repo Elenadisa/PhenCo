@@ -46,38 +46,38 @@ User have to define input/output paths in launch scripts:
 *Input*. 
 User need to define to input file in 
 ``
-*input_file_path=/PATH/TO/INPUT/FILE* 
+input_file_path=/PATH/TO/INPUT/FILE 
 ``
 line of launch_build_networks.sh. 
 Input file must be in XX format.  
 *Output*. 
 User need to define data output path in 
 ``
-*/PATH/TO/OUTPUT/FILES/PhenCo* 
+/PATH/TO/OUTPUT/FILES/PhenCo 
 ``
 line of launch_build_networks.sh. 
 **II launch_analyse_networks.sh**   
 *Input*. 
 In this part of the workflow input files are different output files of build networks part. Defining data path 
 ``
-*data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_nets* in launch_analyse_network.sh
+data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_nets* in launch_analyse_network.sh
 ``
  all needed files are accesibles.  
 *Output*. 
 User need to define data output path in 
 ``
-*/PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks* 
+/PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks
 ``
 line of launch_analyse_networks.sh. 
 **get_comparative_results.sh**. 
 *Input*. 
 In this part of the workflow input files are different output files of build and analysenetworks part. User need to define paths for analyse networks results in 
 ``
-**results_source=PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks** 
+results_source=PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks 
 ``
 and for build networks results in 
 ``
-*build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks*.  
+build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks.  
 ``
 Markdown template to generate html reports are available in 
 ``
