@@ -81,7 +81,7 @@ build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks.
 ``
 Markdown template to generate html reports are available in 
 ``
-reports_template
+report_template
 ``
  directory.
 *Output*
