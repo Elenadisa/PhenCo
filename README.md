@@ -8,9 +8,10 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 ## Requeriments
 
 * Python 3. 
-* R version R-3.3.1. 
+* R version 3.3.1 or higher. 
 * Bioconductor 3.4 or higher. 
-* Markdown. 
+* Markdown.
+* Ruby 2.4.1. 
 
 ### Instalation
 
@@ -18,11 +19,8 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``.   
-**II** Install ruby.  
-**III** Install AutoFlow  
-``
-Code: gem install autoflow
-``.   
+**II** Install [ruby](https://www.ruby-lang.org/en/downloads/).  
+**III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
 **IV** Install NetAnalyser: [GitHub](https://github.com/ElenaRojano/NetAnalyzer).   
 **V** Install [Python 3](https://www.python.org/downloads/) and import librarys: optparse, numpy, os.path.  
 **VI** Instal [R](https://cloud.r-project.org/) and the following R packages: 
