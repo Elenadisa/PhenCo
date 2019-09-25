@@ -21,7 +21,7 @@ git clone https://github.com/Elenadisa/PhenCo
 ``.   
 **II** Install [ruby](https://www.ruby-lang.org/en/downloads/).  
 **III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
-**IV** Install NetAnalyser: [GitHub](https://github.com/ElenaRojano/NetAnalyzer).   
+**IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
 **V** Install [Python 3](https://www.python.org/downloads/) and import librarys: optparse, numpy, os.path.  
 **VI** Instal [R](https://cloud.r-project.org/) and the following R packages: 
 ``
