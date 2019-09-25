@@ -57,8 +57,9 @@ User need to define data output path in
 /PATH/TO/OUTPUT/FILES/PhenCo 
 ``
 line of launch_build_networks.sh. 
-**II launch_analyse_networks.sh**   
-*Input*. 
+
+**II launch_analyse_networks.sh**    
+*Input*.   
 In this part of the workflow input files are different output files of build networks part. Defining data path 
 ``
 data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_nets* in launch_analyse_network.sh
