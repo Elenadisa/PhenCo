@@ -1,0 +1,198 @@
+# Report 6: Patient Details
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  metric_table <- data[['more-spec_table_metrics.txt']]
+  library(dplyr)
+  
+
+
+  load_files <- function(data, column_names, path_column, header){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                
+                for (file_path in paths){
+                  files <- read.table(file_path, sep="\t", header=header, quote="", stringsAsFactors = FALSE)
+                    
+                  }
+                
+                }
+           return(files)     
+        }
+   
+    group_patient_information <- function(df1, df2){
+      patients <- unique(df1$Patient)
+      all_patients <- list()
+
+      for (i in patients){
+        all_groups <- list()
+        hp_groups <- filter(df1, Patient == i)
+        if (nrow(hp_groups) != 0){
+          all_groups[["hpo"]] <- hp_groups
+        }
+
+        system_groups <- filter(df2, Patient == i)
+        if (nrow(system_groups) != 0){
+          all_groups[["system"]] <- system_groups
+          phenotypes_vector_length <- c()
+          phenotypes <- list()
+          for(patient in 1:length(system_groups$Shared_hpos)){
+            phenotypes[patient] <- strsplit(system_groups$Shared_hpos[patient], ", ")
+            number_hpo <- strsplit(system_groups$Shared_hpos[patient], ", ")[[1]]
+            phenotypes_vector_length[patient] <- length(number_hpo)
+          }
+          unique_hpo_list <- unique(unlist(phenotypes))
+          all_groups[["phenotype_length"]] <- length(unique_hpo_list)
+          
+          systems_index <- with(system_groups, order(phenotypes_vector_length, decreasing = TRUE))
+          systems_groups_ordered <- system_groups[systems_index,]
+          rownames(systems_groups_ordered) <- NULL
+          all_groups[["system"]] <- systems_groups_ordered
+
+        }else{
+          all_groups[["phenotype_length"]] <- 0
+        }
+
+        name <- paste0("Patient_", i)
+        all_patients[[name]] <- all_groups 
+        }
+        return(all_patients)  
+    }
+
+  produce_scatterplot <- function(data_set, x_axis, y_axis, x_lab, y_lab, add=FALSE){
+
+      plt <- ggplot(data_set, aes(x=get(x_axis), y=get(y_axis)))
+
+      if (add){
+        plt <- plt + geom_count(stat = "sum", show.legend = TRUE)
+        plt <- plt + theme(legend.title=element_blank())
+        plt <- plt + scale_size(name   = range(1:150),
+               breaks = c(1, 50, 100, 150),
+               labels = c(1, 50, 100, 150))
+      } else {
+        plt <- plt + geom_point()
+      }
+
+      plt <- plt + xlab(x_lab)
+      plt <- plt + ylab(y_lab)
+
+      return(plt)
+    }
+
+```
+
+## Summary tables
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+df <- ddply(metric_table, .(Type), summarize,  "Number of patients to clusters"= mean(patient_overlaping_with_clusters), "Number of patients overlap with functional coherent clusters"= mean(patient_overlaping_with_clusters_functional_coherent))
+
+kable(t(df))
+
+```
+
+### Patients that overlap with clusters build with GO valid pairs 
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+go_df <- ddply(metric_table, .(Type), summarize,  "Number of patients to clusters"= number_of_patients_corresponding_to_at_least_1_cluster_go_0.05, "Number of patients overlap with go functional coherent and OMIM clusters"= number_of_patients_corresponding_both_funsys_omim_go_0.05, "Number of patients overlap with go functional coherent clusters" = number_of_patients_corresponding_to_funsys_go_0.05, "Number of patients orvelap with OMIM clusters" = number_of_patients_corresponding_to_omim_go_0.05)
+
+kable(t(go_df))
+
+```
+
+### Patients that overlap with clusters build with KEGG valid pairs 
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+kegg_df <- ddply(metric_table, .(Type), summarize,  "Number of patients to clusters"= number_of_patients_corresponding_to_at_least_1_cluster_kegg_0.05, "Number of patients overlap with kegg functional coherent and OMIM clusters"= number_of_patients_corresponding_both_funsys_omim_kegg_0.05, "Number of patients overlap with kegg functional coherent clusters" = number_of_patients_corresponding_to_funsys_kegg_0.05, "Number of patients orvelap with OMIM clusters" = number_of_patients_corresponding_to_omim_kegg_0.05)
+
+kable(t(kegg_df))
+
+```
+
+### Patients that overlap with clusters build with Reactome valid pairs 
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+reactome_df <- ddply(metric_table, .(Type), summarize,  "Number of patients to clusters"= number_of_patients_corresponding_to_at_least_1_cluster_reactome_0.05, "Number of patients overlap with reactome functional coherent and OMIM clusters"= number_of_patients_corresponding_both_funsys_omim_reactome_0.05, "Number of patients overlap with reactome functional coherent clusters" = number_of_patients_corresponding_to_funsys_reactome_0.05, "Number of patients orvelap with OMIM clusters" = number_of_patients_corresponding_to_omim_reactome_0.05)
+
+kable(t(reactome_df))
+
+```
+
+## Number of cluster vs number of HPO per patient  
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  
+  all_data_table <- load_files(metric_table, 'Type', 'patients_systems_cases', TRUE)
+  produce_scatterplot(all_data_table, "Prof_length", "Nº_coincedence_clusters", "Number of HPO per patient", "Number of clusters", add=TRUE)
+
+```
+
+**Figure 1**: ***Number of cluster related to the number of HPO per patient*** (*x-axis Number of HPO per patient. y-axis  Number of cluster containing some HPO patient profile*). As we can see, the profile of the patients point to different clusters.
+
+
+
+## Patient data
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
+  library(kableExtra)
+  
+  hpo <- load_files(metric_table, 'Type', 'patient_hpo_genes_go_0.05', TRUE)
+
+  go <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_go_0.05', TRUE)
+  for (i in 1:length(go$Systems)){
+    url <- paste0("http://amigo.geneontology.org/amigo/term/", go$Systems[i])
+    go$Systems[i] <- text_spec(go$Systems[i], link = url)
+  }
+
+  kegg <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_kegg_0.05', TRUE)
+  for (i in 1:length(kegg$Systems)){
+    url <- paste0("https://www.genome.jp/dbget-bin/www_bget?pathway+", kegg$Systems[i])
+    kegg$Systems[i] <- text_spec(kegg$Systems[i], link = url)
+  }
+
+  reactome <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_reactome_0.05', TRUE)
+  for (i in 1:length(reactome$Systems)){
+    url <- paste0("https://reactome.org/content/detail/", reactome$Systems[i])
+    reactome$Systems[i] <- text_spec(reactome$Systems[i], link = url)
+  }
+
+
+  systems <- rbind(go, kegg, reactome)
+  
+  
+                    
+all_patients <- group_patient_information(hpo, systems)
+
+length_vector <- c()
+  for(i in 1:length(all_patients)){
+    list <- all_patients[[i]]
+    phenotype_length <- list["phenotype_length"]
+    length_vector[i] <- phenotype_length
+    }
+
+ordered_patients <- all_patients[order(unlist(length_vector), decreasing=TRUE)]  
+
+for(i in 1:length(ordered_patients)){
+  list <- ordered_patients[[i]]
+  patient_name <- names(ordered_patients[i])
+  cat(patient_name, "\n")
+  for(i in list){
+    print(knitr::kable(i, format="markdown"))
+    cat("\n")
+  }
+}
+
+    
+
+
+```

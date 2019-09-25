@@ -1,0 +1,188 @@
+# Report 5: Cluster Details for Reactome coherent clusters
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  metric_table <- data[['more-spec_table_metrics.txt']]
+  library(dplyr)
+  
+
+
+  load_files <- function(data, column_names, path_column, header){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                
+                for (file_path in paths){
+                  files <- read.table(file_path, sep="\t", header=header, quote="", stringsAsFactors = FALSE)
+                    
+                  }
+                
+                }
+           return(files)     
+        }
+    
+    group_clusters <- function(df){
+      cluster <- unique(df$Cluster)
+      all_clusters <- list()
+      for (i in cluster){
+        groups <- filter(df, Cluster == cluster[i])
+        all_clusters[[i]] <- groups
+
+        }
+       return(all_clusters)
+  }
+   
+    group_cluster_information <- function(df1, df2, df3, df4){
+      clusters <- unique(df1$Cluster)
+      all_clusters <- list()
+      for (i in clusters){
+        all_groups <- list()
+        hp_groups <- filter(df1, Cluster == clusters[i])
+        if (nrow(hp_groups) != 0){
+          all_groups[["hpo"]] <- hp_groups
+        }
+
+        reactome_groups <- filter(df2, Cluster == clusters[i])
+        if (nrow(reactome_groups) != 0){
+          all_groups[["reactome"]] <- reactome_groups
+          scores <- reactome_groups$Percentage_of_nodes_with_funsys
+          score <- max(scores)
+          all_groups[["coherence_score"]] <- score
+        }else{
+          all_groups[["coherence_score"]] <- 0
+        }
+
+        omim_groups <- filter(df3, Cluster == clusters[i])
+        if (nrow(omim_groups) != 0){
+          omim_vector_length <- c()
+          
+          for(omim in 1:length(omim_groups$HPOs_in_clusters)){
+            nb <- strsplit(omim_groups$HPOs_in_clusters[omim], ", ")[[1]]
+            omim_vector_length[omim] <- length(nb)
+          }
+          
+          omim_index <- with(omim_groups, order(omim_vector_length, decreasing = TRUE))
+          omim_groups_ordered <- omim_groups[omim_index,]
+          rownames(omim_groups_ordered) <- NULL
+          
+          all_groups[["omim"]] <- omim_groups_ordered
+        }
+
+        patient_groups <- filter(df4, Cluster == clusters[i])
+        if (nrow(patient_groups) != 0){
+          patient_vector_length <- c()
+          
+          for(patient in 1:length(patient_groups$Shared_hpos)){
+            nb <- strsplit(patient_groups$Shared_hpos[patient], ", ")[[1]]
+            patient_vector_length[patient] <- length(nb)
+          }
+          
+          patient_index <- with(patient_groups, order(patient_vector_length, decreasing = TRUE))
+          patient_groups_ordered <- patient_groups[patient_index,]
+          rownames(patient_groups_ordered) <- NULL
+
+          all_groups[["patient"]] <- patient_groups_ordered
+        }
+        name <- paste0("Cluster_", i)
+        all_clusters[[name]] <- all_groups 
+        }
+        return(all_clusters)  
+    }
+
+```
+
+
+## reactome clusters
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE, results='asis'}
+
+  library(kableExtra)
+  
+  hpo <- load_files(metric_table, 'Type', 'Cluster_hpo_reactome_0.05', TRUE)
+  reactome <- load_files(metric_table, 'Type', 'Cluster_reactome_0.05', TRUE)
+  omim <- load_files(metric_table, 'Type', 'Cluster_omim_reactome_0.05', TRUE)
+  patient <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_reactome_0.05', TRUE)
+
+  for (i in 1:length(reactome$Term)){
+    url <- paste0("https://reactome.org/content/detail/", reactome$Term[i])
+    reactome$Term[i] <- text_spec(reactome$Term[i], link = url)
+  }
+
+  for (i in 1:length(patient$Systems)){
+    url <- paste0("https://reactome.org/content/detail/", patient$Systems[i])
+    patient$Systems[i] <- text_spec(patient$Systems[i], link = url)
+  }
+
+  for (i in 1:length(omim$Term)){
+    omim_id <- unlist(strsplit(omim$Term[i], ":"))
+    url <- paste0("https://www.omim.org/entry/", omim_id[2])
+    omim$Term[i] <- text_spec(omim$Term[i], link = url)
+  }
+
+  all_clusters <- group_cluster_information(hpo, reactome, omim, patient)
+
+  length_vector <- c()
+  for(i in 1:length(all_clusters)){
+    list <- all_clusters[[i]]
+    coherence_score <- list[["coherence_score"]]
+    length_vector[i] <- coherence_score
+    }
+
+  ordered_clusters <- all_clusters[order(length_vector, decreasing=TRUE)]  
+
+  for(i in 1:length(ordered_clusters)){
+    list <- ordered_clusters[[i]]
+    cluster_name <- names(ordered_clusters[i])
+    if(!is.null(list[["reactome"]]) & !is.null(list[["omim"]])){
+      list["coherence_score"] <- NULL
+      cat(cluster_name, "\n")
+      for(i in list){
+        print(knitr::kable(i, format="markdown"))
+        cat("\n")
+      }
+    }
+  }
+
+  for(i in 1:length(ordered_clusters)){
+    list <- ordered_clusters[[i]]
+    cluster_name <- names(ordered_clusters[i])
+    if(!is.null(list[["reactome"]]) & is.null(list[["omim"]])){
+      list["coherence_score"] <- NULL
+      cat(cluster_name, "\n")
+      for(i in list){
+        print(knitr::kable(i, format="markdown"))
+        cat("\n")
+      }
+    }
+  }
+
+  for(i in 1:length(ordered_clusters)){
+    list <- ordered_clusters[[i]]
+    cluster_name <- names(ordered_clusters[i])
+    if(is.null(list[["reactome"]]) & !is.null(list[["omim"]])){
+      list["coherence_score"] <- NULL
+      cat(cluster_name, "\n")
+      for(i in list){
+        print(knitr::kable(i, format="markdown"))
+        cat("\n")
+      }
+    }
+  }
+
+  for(i in 1:length(ordered_clusters)){
+    list <- ordered_clusters[[i]]
+    cluster_name <- names(ordered_clusters[i])
+    if(is.null(list[["reactome"]]) & is.null(list[["omim"]])){
+      list["coherence_score"] <- NULL
+      cat(cluster_name, "\n")
+      for(i in list){
+        print(knitr::kable(i, format="markdown"))
+        cat("\n")
+      }
+    }
+  }
+
+```
