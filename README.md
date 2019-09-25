@@ -43,7 +43,7 @@ BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))
 
 User have to define input/output paths in launch scripts:  
 
-**I launch_build_networks.sh**. 
+**I launch_build_networks.sh**.   
 *Input*.   
 User need to define to input file in 
 ``
