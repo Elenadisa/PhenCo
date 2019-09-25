@@ -20,10 +20,10 @@ PhenCo is a workflow built in autoflow. This workflow analyse comorbidity relati
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``.   
-**II** Install [Ruby](https://www.ruby-lang.org/en/downloads/).  
+**II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
 **III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
 **IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
-**V** Install [Python 3](https://www.python.org/downloads/) and import librarys
+**V** Install [Python 3](https://www.python.org/downloads/) and import librarys:
 ``
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 python3 get-pip.py
