@@ -23,12 +23,15 @@ git clone https://github.com/Elenadisa/PhenCo
 **III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
 **IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
 **V** Install [Python 3](https://www.python.org/downloads/) and import librarys: optparse, numpy, os.path.  
-**VI** Instal [R](https://cloud.r-project.org/) and the following R packages: 
+**VI** Instal [R](https://cloud.r-project.org/) and the following R packages:  
 ``
-install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra')).  
-BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db")). 
+install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra'))   
 ``
-
+  
+``
+BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db")).  
+`` 
+   
 ## Defining PATHS. 
 
 **I** In launch_build_networks.sh introduce the path to the input data.  
