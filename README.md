@@ -22,10 +22,10 @@ git clone https://github.com/Elenadisa/PhenCo
 **V** Install [Python 3](https://www.python.org/downloads/) and install the following librarys:  
 ``
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   
-``  
+``    
 ``
 python3 get-pip.py   
-``. 
+``.   
 ``
 pip3 install optparse-pretty numpy os.path2
 ``  
