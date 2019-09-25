@@ -1,6 +1,7 @@
 # PhenCo Version 1.0
-
-
+  
+PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorbidity of patients cohorts. Rare diseases can have complex phenotypes and be hard to diagnose. Genetic and molecular analysis is made difficult by the small numbers of affected patients. Phenotypic comorbidity analysis can help rectify this by combining information from patients with similar phenotypes and looking for overlap in terms of shared genes and underlying functional systems. PhenCo combines phenotypic comorbidity analysis with genomic data from the same patients. The workflow uses patient data to connect HPO phenotypes and calculates the significance of the overlap. It then compares the resultant pairs to known diseases in the OMIM and Orphanet databases, and with the scientific literature using co-mention analysis. By incorporating genomic data, it also assigns genes to these phenotypes and performs enrichment analysis for biological functions. Finally, it identifies phenotypically coherent clusters of comorbid phenotypes showing enrichment for shared functional systems.
+  
 ## Requeriments
 
 * Python 3. 
@@ -10,7 +11,7 @@
 * R Markdown. 
 
 
-### Instalation
+### Installation in Linux
 
 **I** Clone this repository:
 ``
@@ -38,6 +39,14 @@ BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))
 `` 
 
 ## Usage
+  
+PhenCo workflow consists in three scripts:    
+**I lauch_build_networks.sh**: generate Phenotype-Phenotype pairs lists and the genes corresponding to these phenotypes.    
+It execute an autoflow template *build_networks.af*.   
+**I launch_analayse_network.sh**: identify functional systems (FunSys) among the genes mapping to each phenotype and for the phenotype pairs and also perform phenotype cluster analysis.   
+It execute an autoflow template *analyse_network.af*.   
+**II get_comparative_results.sh**: generates html reports with workflow results.   
+
 
 ### Defining input/output paths. 
 
@@ -97,3 +106,5 @@ The templetes have to be executed in a certain order.
 **II** ./launch_analyse_networks.sh.   
 **III** ./get_comparative_results.sh.   
 
+
+## Citation
