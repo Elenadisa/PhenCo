@@ -1,0 +1,425 @@
+# Report 1: Pairs Report
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  metric_table <- data[['table_metrics.txt']]
+
+  HyI_distribution_plot <- function(df, column, log, xlab, title){
+    plt <- ggplot(df, aes(x=get(column))) + geom_density(alpha=0.4) 
+    plt <- plt + geom_vline(aes(xintercept = 2, colour = "red"))
+    plt <- plt + xlab(xlab)
+    plt <- plt + ylab("Density")
+    plt <- plt + theme(legend.position="none")
+    
+    if(log == 10){
+        plt <- plt + scale_x_log10()
+    }else if (log == 2){
+        plt <- plt + scale_x_continuous(trans='log2')
+    }
+    plt <- plt + ggtitle (title)
+    return(plt)
+}
+
+pairs_prevalence_graph <- function (df, title, log, xlab){
+  colnames(df) <- c("HPO-A", "HPO-B", "Prevalence-A", "Prevalence-B", "Type")
+  df <- mutate(df, prevalence_mean=(rowMeans(df[c("Prevalence-A", "Prevalence-B")], na.rm=TRUE))) 
+
+  df_1 <- rbind(filter(df, Type == "more_spec"), filter(df, Type == "less_spec"), filter(df, Type == "unconnected"))
+
+  plt <- ggplot(df_1, aes(x=prevalence_mean, colour=Type)) + geom_line(aes(linetype=Type), stat="density")
+  plt <- plt + ggtitle(title)
+  plt <- plt + theme(legend.title=element_blank())
+  plt <- plt + xlab(xlab)
+  plt <- plt + ylab("Density")
+
+  if(log == TRUE){
+    plt <- plt + scale_x_log10()
+    }
+
+  return(plt)
+}
+
+
+hpo_prevalence_graph <- function(df, title, xlab){
+  
+  colnames(df) <- c("HPO", "Prevalence")
+
+  plt <- ggplot(df, aes(x=Prevalence)) + geom_line(stat="density") 
+  plt <- plt + ggtitle(title)
+  plt <- plt + ylab("Density")
+  plt <- plt + xlab(xlab)
+  plt <- plt + scale_x_log10() + scale_y_continuous()
+  
+
+  
+
+  return(plt)
+}
+
+  produce_barplot <- function( column, title, ylab, second_column=NULL, add=FALSE){
+    df <- summarySE(metric_table, measurevar=column, groupvars=c("Type"))
+    position <- c("more_spec", "more_spec_l_rdm", "more_spec_n_rdm", "less_spec", "less_spec_l_rdm", "less_spec_n_rdm", "unconnected")
+
+    plt <- ggplot(df, aes(x=Type, y=get(column), fill=Type)) + scale_x_discrete(limits = position)
+    plt <- plt + geom_bar(position=position_dodge(), stat="identity")
+    if(!is.null(second_column)){
+      second_data_frame <- summarySE(metric_table, measurevar=second_column, groupvars=c("Type"))
+      plt <- plt + geom_point(mapping = aes(x = Type, y = second_data_frame[[second_column]])) 
+    }
+    plt <- plt + geom_errorbar(aes(ymin=get(column)-sd, ymax=get(column)+sd),
+                  width=.2,                    # Width of the error bars
+                  position=position_dodge(.9)) #+
+    if(add){
+      #plt <- plt + theme(plot.margin = unit(c(1,5,-30,6),units="points")
+      plt <- plt + theme(axis.text.x=element_blank(),
+          axis.title.x=element_blank(),
+          axis.ticks.x=element_blank()  
+        )
+    }else{
+      plt <- plt + theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+                      axis.title.x=element_blank()
+                      )
+    }
+    plt <- plt + ylab(ylab) #+
+    if(title != ''){
+      plt <- plt + ggtitle(title) #+
+    }
+    plt <- plt + theme(legend.position="none") #+
+    
+    return(plt)
+  }
+
+  produce_stacked_barplot <- function( column1, column2, column3, title, ylab, add=FALSE, legend=FALSE){
+    library(dplyr)
+    library(reshape)
+    
+    df <- select(metric_table, column1, column2, column3)
+    new_df <- melt(df)
+    position <- c("more_spec", "more_spec_l_rdm", "more_spec_n_rdm", "less_spec", "less_spec_l_rdm", "less_spec_n_rdm", "unconnected")
+      
+    plt <- ggplot(new_df, aes(x=Type, y=value, fill=variable)) + scale_x_discrete(limits = position) 
+    plt <- plt + geom_bar(stat='identity', position="fill")
+
+    plt <- plt + theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+                      axis.title.x=element_blank()
+                      )
+    if(add){
+      #plt <- plt + theme(plot.margin = unit(c(1,5,-30,6),units="points"))
+      plt <- plt + theme(legend.position="none")
+      
+    }else{
+      plt <- plt + scale_fill_discrete(labels = c("Consistent GO terms", "Emergent GO terms"))
+      plt <- plt + theme(legend.position="bottom", legend.direction="vertical",
+                 legend.title = element_blank())
+    }
+    plt <- plt + ylab(ylab) #+
+    if(title != ''){
+      plt <- plt + ggtitle(title) #+
+    }
+
+    return(plt)
+  }
+
+    load_files <- function(data, column_names, path_column, header){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        all_data <- data.frame()
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                name_list <- paste(combination, collapse='_')
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                count = 1
+
+                for(file_path in paths){
+                        files <- read.table(file_path, sep="\t", header=header)
+                        all_data <- rbind(all_data, files)   
+                }             
+        }
+       
+        return(all_data)
+
+      }
+
+
+  load_comention_files <- function(data, column_names, path_column, header, col_name_vector, group1, group2, group3){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        all_data <- data.frame()
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                name_list <- paste(combination, collapse='_')
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                count = 1
+
+                for(file_path in paths){
+                        files <- read.table(file_path, sep="\t", header=header)
+                        files$V4 <- NULL
+                        files <- cbind(files ,rep(c(paste(name_list)), nrow(files)))
+                        files <- cbind(files ,rep(c(paste(name_list,count, sep="_")), nrow(files)))
+                        if(startsWith(name_list, group1)){
+                          files <- cbind(files ,rep(c(paste(group1)), nrow(files)))
+                        }else if(startsWith(name_list, group2)){
+                          files <- cbind(files ,rep(c(paste(group2)), nrow(files)))
+                        }else{
+                          files <- cbind(files ,rep(c(paste(group3)), nrow(files)))
+                        }
+                        colnames(files) <- col_name_vector
+                        count <- count + 1
+
+                        all_data <- rbind(all_data, files)   
+                }             
+        }
+       
+        return(all_data)
+
+      }
+
+
+      produce_density_plot <- function(data_table, values, net_names, net_types, x_scale = FALSE, x_lab, title, facet = FALSE){
+        plt <- ggplot(data_table, aes(x=get(values))) + geom_density(aes(group=get(net_names), colour=get(net_types)))
+        col <- c("firebrick1", "orange4", "deepskyblue2", "lightseagreen")
+
+        if (facet == TRUE){
+          plt <- plt + facet_wrap( ~ groups, scales = "free")
+        }
+        if(x_scale == TRUE){
+          plt <- plt + scale_x_continuous(limits = c(0, 1))
+        }
+        plt <- plt + ylim(0, 4.5)
+        plt <- plt + xlab(x_lab)
+        plt <- plt + ylab("Density")
+        plt <- plt + ggtitle(title)
+        plt <- plt + theme(legend.title=element_blank())
+        plt <- plt + scale_fill_manual(values = col)
+        plt <- plt + scale_color_manual(values = col)
+
+        return(plt)
+      }
+
+
+```
+
+
+We want to study comorbidity relationships between phenotypes pairs from DECIPHER database.
+
+We have built different networks:  
+  
+**1. more_spec (Comorbidity Network)**: HPO pairs with a HyI >= 2.  
+**2. less_spec**: HPO pairs with a HyI < 2.  
+**4. random_links**: randmly shufflerd the associations between HPO pairs, while keeping the number of edges and nodes unchanged.  
+**5. random_nodes**: Have de same properties and topological structure than the Hypergeometic_phen_reliable_terms. But the number of edges per node change.  
+**6. unconnected**: Random selection of HPO pairs that are not connected by any patient in DECIPHER database (negative control). 
+
+
+### Properties of the phenotype-phenotype pairs lists and random models
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  build_metric_table <- read.table("../results/build_metrics", sep="\t", header = FALSE)
+  colnames(build_metric_table) <- c("Metric", "Value")
+  kable(build_metric_table)
+```
+  
+**Table 1**: Properties of the phenotype-phenotype pairs lists and random models.
+
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+
+hyi_data <- read.table("../results/phen2phen_net", header=FALSE)
+colnames(hyi_data) <- c("HPO-A", "HPO-B", "HyI")
+HyI_distribution_plot(hyi_data, "HyI",log = FALSE, "Hypergeometric index", "Hypergeometric index distribution")
+
+single_prevalence_data <- read.table("../results/all_hpo_prevalence", header=FALSE)
+hpo_prevalence_graph(single_prevalence_data, "Phenotype prevalence in DECIPHER", "Prevalence (%)")
+
+
+prevalence_pairs_data <- load_files(metric_table, "Type", "decipher_pairs_prevalence", header=FALSE)
+pairs_prevalence_graph(prevalence_pairs_data, "Phenotype pairs prevalence in DECIPHER", log = TRUE, "Mean prevalence (%)")
+  
+
+
+```
+  
+**Figure 1**: Properties of the phenotype-phenotype pairs  
+
+
+### Number of genes mapping to each phenotype pair
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  gene_table <- load_files(metric_table, "Type", "pairs_genes_table", header=FALSE)
+  colnames(gene_table) <- c("HPO-A", "HPO-B", "GENES-A", "GENES-B", "Union_genes", "Intersection_genes", "Net_type")
+
+  kable(ddply(gene_table, .(Net_type), summarize, "Genes mean per pair" = mean(Union_genes)))
+
+
+```
+
+### Topological analysis
+
+#### MEAN
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+	metric_table <- data[['table_metrics.txt']]
+	kable(ddply(metric_table, .(Type), summarize, Clustering.coef= mean(Clustering.coef), Diameter = mean(Diameter), Average.minimum.path= mean(Average.minimum.path), Number.of.nodes = mean(Number.of.nodes)))  
+
+```
+
+#### STANDARD DEVIATION
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  metric_table <- data[['table_metrics.txt']]
+  kable(ddply(metric_table, .(Type), summarize, Clustering.coef= sd(Clustering.coef), Diameter = sd(Diameter), Average.minimum.path= sd(Average.minimum.path), Number.of.nodes = sd(Number.of.nodes)))  
+
+```  
+  
+**Table 2**: Topological Analysis results from the different Pairs Lists. 
+
+### Overlap of the pairs lists with known diseases
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  grid.arrange(  
+    produce_barplot("confirmed_pairs_OMIM_cut_1", "At least one disease", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_ORPHA_cut_1", "At least one disease", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_OMIM_cut_2", "At least two diseases", "Pairs", add=TRUE),
+    produce_barplot("confirmed_pairs_ORPHA_cut_2", "At least two diseases", "Pairs", add=TRUE),
+    ncol= 2, nrow = 2,
+    top = "OMIM / Orphanet"
+  )
+  grid.arrange(  
+    produce_barplot("confirmed_pairs_OMIM_cut_3", "At least three diseases", "Pairs"),
+    produce_barplot("confirmed_pairs_ORPHA_cut_3", "At least three iseases", "Pairs"),
+    ncol= 2
+  )
+```
+  
+**Figure 2**: Number of phenotype pairs that appear together in OMIM (left) and Orphanet (right) diseases. 
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  metric_table <- data[['table_metrics.txt']]
+  kable(ddply(metric_table, .(Type), summarize, "Confirmed pairs OMIM"= mean(confirmed_pairs_OMIM_cut_3), "Confirmed pairs Orphanet"= mean(confirmed_pairs_ORPHA_cut_3), "Union diseases" = mean(Union_Diseases_cut_3), "Intersection diseases" = mean(Intersection_Diseases_cut_3)))  
+
+```
+  
+**Table 3**: Overlap with diseases summary. 
+  
+
+## Comention analysis.
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+comention_data <- load_comention_files(metric_table, 'Type', 'comention_analysis', FALSE, c("HPOA", "HPOB", "Pvalue", "Net_type", "Net_name", "groups"), "more_spec", "less_spec", "unconnected")
+comention_suitable <- subset(comention_data, Net_type %in% c("more_spec", "more_spec_l_rdm", "less_spec", "less_spec_l_rdm"))
+
+produce_density_plot(comention_suitable, "Pvalue", "Net_name", "Net_type", x_scale = TRUE, "P-value", "P-value distribution", facet = TRUE)
+
+
+```
+  
+**Figure 3**: Comention pvalue density plot.
+  
+
+## PMID per pairs list.
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+pmid_data <- load_comention_files(metric_table, 'Type', 'pmid_analysis', FALSE, c("HPOA", "HPOB", "Union_PMID", "Net_type", "Net_name", "groups"), "more_spec", "less_spec", "unconnected")   
+pmid_suitable <- subset(pmid_data, Net_type %in% c("more_spec", "more_spec_l_rdm", "less_spec", "less_spec_l_rdm"))
+
+kable(ddply(pmid_suitable, .(Net_type), summarize, "Union PMID mean"= mean(Union_PMID), "Union PMID sd"= sd(Union_PMID), "Union PMID median" = median(Union_PMID), "Union PMID IQR" = IQR(Union_PMID))) 
+```
+  
+**Table 4**: Union PMID metrics per network type.
+  
+
+
+### Emergent and consistent functional systems
+  
+#### KEGG   
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  produce_barplot("hpo_pairs_with_at_least_1term_kegg_0.05", "Pairs number with KEGG enrichment", "Pairs", add=FALSE)
+
+  grid.arrange(
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_kegg_0.05", "pairs_with_emergent_terms_kegg_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_kegg_0.05", "emergent_enriched_terms_kegg_0.05", " ", "Pathways", add=FALSE),
+    ncol=2
+  )
+  
+```
+  
+**Figure 4**: KEGG enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of pairs with consistent/emergent pathways.    
+  
+
+#### Mean
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term KEGG" = mean(hpo_pairs_with_at_least_1term_kegg_0.05), "Consistent enriched terms KEGG"= mean(consistent_enriched_terms_kegg_0.05), "Emergent enriched terms KEGG" = mean(emergent_enriched_terms_kegg_0.05), "Pairs with consistent terms KEGG"=mean(pairs_with_consistent_terms_kegg_0.05), "Pairs with emergent terms KEGG"=mean(pairs_with_emergent_terms_kegg_0.05)))
+```
+  
+#### SD
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term KEGG" = sd(hpo_pairs_with_at_least_1term_kegg_0.05), "Consistent enriched terms KEGG"= sd(consistent_enriched_terms_kegg_0.05), "Emergent enriched terms KEGG" = sd(emergent_enriched_terms_kegg_0.05), "Pairs with consistent terms KEGG"=sd(pairs_with_consistent_terms_kegg_0.05), "Pairs with emergent terms KEGG"=sd(pairs_with_emergent_terms_kegg_0.05)))
+```
+
+**Table 5**: Summary of KEGG functional analysis
+  
+#### Reactome
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  produce_barplot("hpo_pairs_with_at_least_1term_reactome_0.05", "Pairs number with Reactome enrichment", "Pairs", add=FALSE)
+  
+  grid.arrange(
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_reactome_0.05", "pairs_with_emergent_terms_reactome_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_reactome_0.05", "emergent_enriched_terms_reactome_0.05", " ", "Pathways", add=FALSE),
+    ncol=2
+  )
+  
+```  
+  
+**Figure 5**: Reactome enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of pairs with consistent/emergent pathways.
+  
+#### Mean
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term Reactome" = mean(hpo_pairs_with_at_least_1term_reactome_0.05), "Consistent enriched terms Reactome" = mean(consistent_enriched_terms_reactome_0.05), "Emergent enriched terms Reactome" = mean(emergent_enriched_terms_reactome_0.05), "Pairs with consistent terms Reactome"=mean(pairs_with_consistent_terms_reactome_0.05), "Pairs with emergent terms Reactome"=mean(pairs_with_emergent_terms_reactome_0.05)))
+```  
+  
+#### SD
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term Reactome" = sd(hpo_pairs_with_at_least_1term_reactome_0.05), "Consistent enriched terms Reactome" = sd(consistent_enriched_terms_reactome_0.05), "Emergent enriched terms Reactome" = sd(emergent_enriched_terms_reactome_0.05), "Pairs with consistent terms Reactome"=sd(pairs_with_consistent_terms_reactome_0.05), "Pairs with emergent terms Reactome"=sd(pairs_with_emergent_terms_reactome_0.05)))
+```
+  
+**Table 6**: Summary of Reactome functional analysis
+
+#### GO  
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+  produce_barplot("hpo_pairs_with_at_least_1term_go_0.05", "Pairs number with GO enrichment", "Pairs", add=FALSE)
+  
+  grid.arrange(
+    produce_stacked_barplot("Type", "pairs_with_consistent_terms_go_0.05", "pairs_with_emergent_terms_go_0.05", " ", "Pairs", add = TRUE),
+    produce_stacked_barplot("Type", "consistent_enriched_terms_go_0.05", "emergent_enriched_terms_go_0.05", " ", "Pathways", add=FALSE),
+    ncol=2  
+  )
+  
+```
+  
+**Figure 6**: GO enrichment analysis. **Top**: Number of pairs with at least one consistent or emergent pathways. **Bottom left**: Number of consistent/emergent pathways. **Bottom right**: Number of pairs with consistent/emergent pathways.
+  
+#### Mean
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term GO" = mean(hpo_pairs_with_at_least_1term_go_0.05), "Consistent enriched terms GO"= mean(consistent_enriched_terms_go_0.05), "Emergent enriched terms GO" = mean(emergent_enriched_terms_go_0.05), "Pairs with consistent terms GO"=mean(pairs_with_consistent_terms_go_0.05), "Pairs with emergent terms GO"=mean(pairs_with_emergent_terms_go_0.05)))
+```
+  
+#### SD
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+kable(ddply(metric_table, .(Type), summarize, "HPO pairs with at least 1 term GO" = sd(hpo_pairs_with_at_least_1term_go_0.05), "Consistent enriched terms GO"= sd(consistent_enriched_terms_go_0.05), "Emergent enriched terms GO" = sd(emergent_enriched_terms_go_0.05), "Pairs with consistent terms GO"=sd(pairs_with_consistent_terms_go_0.05), "Pairs with emergent terms GO"=sd(pairs_with_emergent_terms_go_0.05)))
+```
+  
+**Table 7**: Summary of GO functional analysis
+
+
