@@ -102,7 +102,7 @@ source ~soft_bio_267/initializes/init_autoflow
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
 mkdir /PATH/TO/OUTPUT/FILES/PhenCo
-mkdir /PATH/TO/OUTPUT/FILES/PhenCo/build_nets
+mkdir /PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 
 # PREPARE VARIABLES NEEDED IN build_networks.af
 

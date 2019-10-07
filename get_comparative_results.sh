@@ -9,9 +9,9 @@ module load ruby/2.4.1
 module load python/anaconda-3_440
 source ~soft_bio_267/initializes/init_R
 
-results_source=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks
+results_source=PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks
 
-build_results_source=/mnt/scratch/users/bio_267_uma/elenads/test1/build_uneriched_nets
+build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 
 PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/rscripts:$PATH
 PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/py_scripts:$PATH
