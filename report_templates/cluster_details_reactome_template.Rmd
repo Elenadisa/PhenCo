@@ -71,21 +71,6 @@
           all_groups[["omim"]] <- omim_groups_ordered
         }
 
-        patient_groups <- filter(df4, Cluster == clusters[i])
-        if (nrow(patient_groups) != 0){
-          patient_vector_length <- c()
-          
-          for(patient in 1:length(patient_groups$Shared_hpos)){
-            nb <- strsplit(patient_groups$Shared_hpos[patient], ", ")[[1]]
-            patient_vector_length[patient] <- length(nb)
-          }
-          
-          patient_index <- with(patient_groups, order(patient_vector_length, decreasing = TRUE))
-          patient_groups_ordered <- patient_groups[patient_index,]
-          rownames(patient_groups_ordered) <- NULL
-
-          all_groups[["patient"]] <- patient_groups_ordered
-        }
         name <- paste0("Cluster_", i)
         all_clusters[[name]] <- all_groups 
         }
@@ -104,16 +89,15 @@
   hpo <- load_files(metric_table, 'Type', 'Cluster_hpo_reactome_0.05', TRUE)
   reactome <- load_files(metric_table, 'Type', 'Cluster_reactome_0.05', TRUE)
   omim <- load_files(metric_table, 'Type', 'Cluster_omim_reactome_0.05', TRUE)
-  patient <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_reactome_0.05', TRUE)
 
   for (i in 1:length(reactome$Term)){
     url <- paste0("https://reactome.org/content/detail/", reactome$Term[i])
     reactome$Term[i] <- text_spec(reactome$Term[i], link = url)
   }
 
-  for (i in 1:length(patient$Systems)){
-    url <- paste0("https://reactome.org/content/detail/", patient$Systems[i])
-    patient$Systems[i] <- text_spec(patient$Systems[i], link = url)
+  for (i in 1:length(hpo$Term)){
+    url <- paste0("https://hpo.jax.org/app/browse/search?q=", hpo$Term[i], "&navFilter=all")
+    hpo$Term[i] <- text_spec(hpo$Term[i], link = url)
   }
 
   for (i in 1:length(omim$Term)){
@@ -122,7 +106,7 @@
     omim$Term[i] <- text_spec(omim$Term[i], link = url)
   }
 
-  all_clusters <- group_cluster_information(hpo, reactome, omim, patient)
+  all_clusters <- group_cluster_information(hpo, reactome, omim)
 
   length_vector <- c()
   for(i in 1:length(all_clusters)){

@@ -71,21 +71,6 @@
           all_groups[["omim"]] <- omim_groups_ordered
         }
 
-        patient_groups <- filter(df4, Cluster == clusters[i])
-        if (nrow(patient_groups) != 0){
-          patient_vector_length <- c()
-          
-          for(patient in 1:length(patient_groups$Shared_hpos)){
-            nb <- strsplit(patient_groups$Shared_hpos[patient], ", ")[[1]]
-            patient_vector_length[patient] <- length(nb)
-          }
-          
-          patient_index <- with(patient_groups, order(patient_vector_length, decreasing = TRUE))
-          patient_groups_ordered <- patient_groups[patient_index,]
-          rownames(patient_groups_ordered) <- NULL
-
-          all_groups[["patient"]] <- patient_groups_ordered
-        }
         name <- paste0("Cluster_", i)
         all_clusters[[name]] <- all_groups 
         }
@@ -103,25 +88,24 @@
   hpo <- load_files(metric_table, 'Type', 'Cluster_hpo_go_0.05', TRUE)
   go <- load_files(metric_table, 'Type', 'Cluster_go_0.05', TRUE)
   omim <- load_files(metric_table, 'Type', 'Cluster_omim_go_0.05', TRUE)
-  patient <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_go_0.05', TRUE)
-
+  
   for (i in 1:length(go$Term)){
     url <- paste0("http://amigo.geneontology.org/amigo/term/", go$Term[i])
     go$Term[i] <- text_spec(go$Term[i], link = url)
   }
 
-  for (i in 1:length(patient$Systems)){
-    url <- paste0("http://amigo.geneontology.org/amigo/term/", patient$Systems[i])
-    patient$Systems[i] <- text_spec(patient$Systems[i], link = url)
+    for (i in 1:length(hpo$Term)){
+    url <- paste0("https://hpo.jax.org/app/browse/search?q=", hpo$Term[i], "&navFilter=all")
+    hpo$Term[i] <- text_spec(hpo$Term[i], link = url)
   }
-
-    for (i in 1:length(omim$Term)){
+    
+  for (i in 1:length(omim$Term)){
     omim_id <- unlist(strsplit(omim$Term[i], ":"))
     url <- paste0("https://www.omim.org/entry/", omim_id[2])
     omim$Term[i] <- text_spec(omim$Term[i], link = url)
   }
 
-  all_clusters <- group_cluster_information(hpo, go, omim, patient)
+  all_clusters <- group_cluster_information(hpo, go, omim)
 
   length_vector <- c()
   for(i in 1:length(all_clusters)){
