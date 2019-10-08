@@ -1,0 +1,288 @@
+# Report 7: Article Figures
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+metric_table <- data[['table_metrics.txt']]
+
+
+  load_files <- function(data, column_names, path_column, header){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        all_data <- data.frame()
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                name_list <- paste(combination, collapse='_')
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                count = 1
+
+                for(file_path in paths){
+                        files <- read.table(file_path, sep="\t", header=header)
+                        all_data <- rbind(all_data, files)   
+                }             
+        }
+       
+        return(all_data)
+
+      }
+
+
+HyI_distribution_plot <- function(df, column, log, xlab, title, label){
+    plt <- ggplot(df, aes(x=get(column))) + geom_density(alpha=0.4) 
+    plt <- plt + geom_vline(aes(xintercept = 2, colour = "red"))
+    plt <- plt + xlab(xlab)
+    plt <- plt + ylab("Density")
+    plt <- plt + theme(legend.position="none")
+    plt <- plt + labs(tag = label)
+    if(log == 10){
+        plt <- plt + scale_x_log10()
+    }else if (log == 2){
+        plt <- plt + scale_x_continuous(trans='log2')
+    }
+    plt <- plt + ggtitle (title)
+    return(plt)
+}
+
+pairs_prevalence_graph <- function (df, title, log, xlab, label){
+	colnames(df) <- c("HPO-A", "HPO-B", "Prevalence-A", "Prevalence-B", "Type")
+	df <- mutate(df, prevalence_mean=(rowMeans(df[c("Prevalence-A", "Prevalence-B")], na.rm=TRUE))) 
+
+	df_1 <- rbind(filter(df, Type == "more_spec"), filter(df, Type == "less_spec"))
+
+	plt <- ggplot(df_1, aes(x=prevalence_mean, colour=Type)) + geom_line(aes(linetype=Type), stat="density")
+	plt <- plt + ggtitle(title)
+  plt <- plt + scale_colour_discrete(labels = c("less-spec", "more-spec"))
+  plt <- plt + scale_linetype_discrete(labels = c("less-spec", "more-spec"))
+  plt <- plt + theme(legend.title=element_blank())
+  plt <- plt + xlab(xlab)
+  plt <- plt + ylab("Density")
+  plt <- plt + labs(tag = label)
+  
+
+	if(log == TRUE){
+		plt <- plt + scale_x_log10()
+		}
+
+	return(plt)
+}
+
+
+hpo_prevalence_graph <- function(df, title, label, xlab){
+	
+	colnames(df) <- c("HPO", "Prevalence")
+
+	plt <- ggplot(df, aes(x=Prevalence)) + geom_line(stat="density") 
+	plt <- plt + ggtitle(title)
+	plt <- plt + scale_x_log10() + scale_y_continuous()
+  plt <- plt + labs(tag = label)
+  plt <- plt + xlab(xlab)
+  plt <- plt + ylab("Density")
+
+	
+
+	return(plt)
+}
+
+produce_facet_barplot <- function(column, title, ylab, extra_label){
+    df <- summarySE(metric_table, measurevar=column, groupvars=c("Type"))
+    groups <- c("less-spec", "less-spec", "less-spec", "more-spec", "more-spec", "more-spec", "unconnected")
+    label <- c("real", "rd_links", "rd_nodes", "real", "rd_links", "rd_nodes", "unconnected")
+    df <- cbind(df, groups)
+    df$facets <- factor(df$groups, levels = c("more-spec", "less-spec", "unconnected"))
+
+    position <- c("more_spec", "more_spec_l_rdm", "more_spec_n_rdm", "less_spec", "less_spec_l_rdm", "less_spec_n_rdm", "unconnected")
+
+    plt <- ggplot(df, aes(x=Type, y=get(column), fill=Type)) + scale_x_discrete(limits = position) 
+    plt <- plt + facet_wrap( ~ facets, scales = "free_x")
+    plt <- plt + geom_bar(position=position_dodge(), stat="identity")
+    plt <- plt + geom_errorbar(aes(ymin=get(column)-sd, ymax=get(column)+sd),
+                  width=.2,                    # Width of the error bars
+                  position=position_dodge(.9)) #+
+    
+    plt <- plt + theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+                      axis.title.x=element_blank()
+                      )
+
+    plt <- plt + scale_x_discrete(breaks=c("more_spec", "more_spec_l_rdm", "more_spec_n_rdm", "less_spec", "less_spec_l_rdm", "less_spec_n_rdm", "unconnected"),
+                                  labels=c("real", "rdm links","rdm nodes","real","rdm links","rdm nodes", "unconnected")
+                                  )
+                                  
+    plt <- plt + ggtitle(title)
+    plt <- plt + ylab(ylab) #+
+    plt <- plt + theme(legend.position="none") #+
+
+    plt <- plt + theme(plot.background = element_rect(fill = "white"))
+    plt <- plt + labs(tag = extra_label)
+
+    
+    return(plt)
+  }
+
+  load_comention_files <- function(data, column_names, path_column, header, col_name_vector, group1, group2, group3){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        all_data <- data.frame()
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                name_list <- paste(combination, collapse='_')
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                count = 1
+
+                for(file_path in paths){
+                        files <- read.table(file_path, sep="\t", header=header)
+                        files$V4 <- NULL
+                        files <- cbind(files ,rep(c(paste(name_list)), nrow(files)))
+                        files <- cbind(files ,rep(c(paste(name_list,count, sep="_")), nrow(files)))
+                        if(startsWith(name_list, group1)){
+                          files <- cbind(files ,rep(c(paste("more-spec")), nrow(files)))
+                        }else if(startsWith(name_list, group2)){
+                          files <- cbind(files ,rep(c(paste("less-spec")), nrow(files)))
+                        }else{
+                          files <- cbind(files ,rep(c(paste("unconnected")), nrow(files)))
+                        }
+                        colnames(files) <- col_name_vector
+                        count <- count + 1
+
+                        all_data <- rbind(all_data, files)   
+                }             
+        }
+       
+        return(all_data)
+
+      }
+
+      produce_density_plot <- function(data_table, values, net_names, net_types, x_scale = FALSE, x_lab, title, facet = FALSE, label){
+        data_table$groups_f = factor(data_table$groups, levels=c('more-spec','less-spec'))
+        plt <- ggplot(data_table, aes(x=get(values))) + geom_density(aes(group=get(net_names), colour=get(net_types)))
+        col <- c("firebrick1", "orange3", "deepskyblue2", "lightseagreen")
+        if (facet == TRUE){
+          plt <- plt + facet_wrap( ~ groups_f, scales = "free")
+        }
+        if(x_scale == TRUE){
+          plt <- plt + scale_x_continuous(limits = c(0, 1))
+        }
+        
+        plt <- plt + scale_colour_manual(values = col, labels = c("less-spec", "less-spec rdm links", "more-spec rdm links", "more-spec"))
+        plt <- plt + ylim(0, 4.5)
+        plt <- plt + xlab(x_lab)
+        plt <- plt + ylab("Density")
+        plt <- plt + ggtitle(title)
+        plt <- plt + geom_hline(yintercept=0, colour="white", size=1)
+        plt <- plt + theme(legend.title=element_blank())
+        plt <- plt + labs(tag = label)
+        return(plt)
+      }
+
+produce_stacked_barplot <- function( column1, column2, column3, title, ylab, add=FALSE, label, legend=FALSE){
+    library(dplyr)
+    library(reshape)
+    
+    df <- select(metric_table, column1, column2, column3)
+    new_df <- melt(df)
+    position <- c("more_spec", "more_spec_l_rdm", "more_spec_n_rdm", "less_spec", "less_spec_l_rdm", "less_spec_n_rdm", "unconnected")
+      
+    plt <- ggplot(new_df, aes(x=Type, y=value, fill=variable)) + scale_x_discrete(limits = position)
+    plt <- plt + geom_bar(stat='identity', position="dodge")
+    plt <- plt + labs(tag = label)
+     plt <- plt + theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+                      axis.title.x=element_blank()
+                      )
+    if(add){
+      #plt <- plt + theme(plot.margin = unit(c(1,5,-30,6),units="points"))
+      plt <- plt + theme(legend.position="none")
+      
+    }else{
+      plt <- plt + scale_fill_discrete(labels = c("Consistent", "Emergent"))
+      plt <- plt + theme(legend.title = element_blank())
+    }
+
+    plt <- plt + ylab(ylab) #+
+    if(title != ''){
+      plt <- plt + ggtitle(title) #+
+    }
+    
+
+    return(plt)
+  }
+
+```
+
+
+
+
+### Properties of the phenotype-phenotype pairs lists and random models
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+
+df <- read.table("/mnt/scratch/users/bio_267_uma/elenads/build_both_nets_enriched/NetAnalyzer.rb_0001/phen2phen_net", sep ="\t", header = FALSE)
+colnames(df) <- c("HPO-A", "HPO-B", "HyI")
+prevalence_single_decipher <- read.table("/mnt/scratch/users/bio_267_uma/elenads/build_both_nets_enriched/shuf_0000/all_hpo_prevalence", sep ="\t", header = FALSE)
+prevalence_pairs_decipher <- load_files(metric_table, "Type", "decipher_pairs_prevalence", header=FALSE)
+
+grid.arrange(
+				HyI_distribution_plot(df, "HyI",log = FALSE, "Hypergeometric index", "Hypergeometric index distribution", "A"),
+				hpo_prevalence_graph(prevalence_single_decipher, "Phenotype prevalence DECIPHER", "B", "Prevalence (%)"),
+				pairs_prevalence_graph(prevalence_pairs_decipher, "Phenotype pairs prevalence DECIPHER", log = TRUE, "Mean prevalence (%)", "C"),
+				ncol=2,
+				heights=c(6,7), 
+				layout_matrix = rbind(c(1,2), c(3,3))
+
+			)
+
+```
+  
+**Figure 3:** Properties of the Phenotype-Phenotype pairs. {A} Distribution of Hypergeometric Index values for all Phenotype-Phenotype pairs. The vertical line represents a cut-off of 2 used to separate more and less-specific pairs.{B} Prevalence distribution for all phenotypes in the DECIPHER dataset, defined percentage of patients in which a phenotype occurs. {C} Distribution of average prevalence for pairs of phenotypes in the more and less-specific pairs lists.
+
+
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+comention_data <- load_comention_files(metric_table, 'Type', 'comention_analysis', FALSE, c("HPOA", "HPOB", "Pvalue", "Net_type", "Net_name", "groups"), "more_spec", "less_spec", "unconnected")   
+comention_suitable <- subset(comention_data, Net_type %in% c("more_spec", "more_spec_l_rdm", "less_spec", "less_spec_l_rdm"))
+grid.arrange(
+			produce_facet_barplot("confirmed_pairs_OMIM_cut_3", "Overlap with OMIM", "Pairs", "A"),
+    	produce_facet_barplot("confirmed_pairs_ORPHA_cut_3", "Overlap with Orphanet", "Pairs", "B"),
+    	produce_density_plot(comention_suitable, "Pvalue", "Net_name", "Net_type", x_scale = TRUE, "P-value", " ", facet = TRUE, "C"),
+    	layout_matrix = rbind(c(1,1,1,1,2,2,2,2, NA), c(3,3,3,3,3)),
+    	heights=c(6,7)
+			)
+
+```
+
+**Figure 4:** Comparison between the comorbid pairs and external data sources. {A}  Overlap of the pairs lists with at least three known diseases from OMIM (left) and Orphanet (right). {B} Distributions of P-values obtained for the co-mention analysis, for the more-specific pairs list (left) compared to the less-specific pairs list. In both cases, the distributions are compared to those of the links random datasets. Spec: specific, uncon: unconnected, l rdm and n rdm: links-based  random model and nodes-based random model. Figures generated by the PhenCo workflow.
+
+
+## Emergent and consistent functional systems
+  
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+produce_facet_barplot("hpo_pairs_with_at_least_1term_go_0.05", "Pairs number with GO enrichment", "Pairs", "A")
+
+grid.arrange(
+			produce_stacked_barplot("Type", "pairs_with_consistent_terms_go_0.05", "pairs_with_emergent_terms_go_0.05", "", "Pairs", add = TRUE, "B"),
+      produce_stacked_barplot("Type", "consistent_enriched_terms_go_0.05", "emergent_enriched_terms_go_0.05", "", "Funsys", add = FALSE, "C"), 
+    	layout_matrix = rbind(c(1,1,2,2,2))
+      )
+
+```
+  
+**Figure 5:** Consistent and emergent functional systems from pairs from the different datasets. {A} Total numbers of pairs that show consistent or emergent functional systems for each pairs list. {B} Total numbers of emergent and consistent functional systems among the pairs lists. {C} Numbers of pairs with emergent and/or consistent functional systems. Figures generated by the PhenCo workflow.
+
+
+## PhenCo finds functionally consistent clusters
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+
+grid.arrange(
+			      produce_facet_barplot("clusters_number_go_0.05", "Number of clusters", "Number of clusters", "A"),
+            produce_facet_barplot("clusters_with_omim_diseases_missing_1_go_0.05", "OMIM overlap", "Number of clusters", "B"),
+            produce_facet_barplot("clusters_enrich_70_percent_go_0.05", "GO coherent", "Number of clusters", "C"),
+            produce_facet_barplot("clusters_with_omim_diseases_missing_1_enrich_70_percent_go_0.05", "OMIM overlap, GO coherent", "Number of clusters", "D"),
+            ncol = 2, nrow = 2
+			)
+
+```
+
+**Figure 6:** Properties of the clusters found by PhenCo for GO analysis. {A} Total clusters. {B} Number of clusters where all phenotypes are found within the same OMIM disease, allowing for one missing phenotype. {C} Number of clusters for which all phenotypes show enrichment for the same GO term. {D} Number of clusters where all phenotypes are found within the same OMIM disease, allowing for one missing phenotype, and all phenotypes show enrichment for the same GO term. Figures generated by the PhenCo workflow.
