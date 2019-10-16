@@ -69,7 +69,21 @@
           
           all_groups[["omim"]] <- omim_groups_ordered
         }
+        patient_groups <- filter(df4, Cluster == clusters[i])
+        if (nrow(patient_groups) != 0){
+          patient_vector_length <- c()
+          
+          for(patient in 1:length(patient_groups$shared_hpos)){
+            nb <- strsplit(patient_groups$shared_hpos[patient], ", ")[[1]]
+            patient_vector_length[patient] <- length(nb)
+          }
+          
+          patient_index <- with(patient_groups, order(patient_vector_length, decreasing = TRUE))
+          patient_groups_ordered <- patient_groups[patient_index,]
+          rownames(patient_groups_ordered) <- NULL
 
+          all_groups[["patient"]] <- patient_groups_ordered
+        }
         name <- paste0("Cluster_", i)
         all_clusters[[name]] <- all_groups 
         }
@@ -90,6 +104,7 @@
   hpo <- load_files(metric_table, 'Type', 'Cluster_hpo_reactome_0.05', TRUE)
   reactome <- load_files(metric_table, 'Type', 'Cluster_reactome_0.05', TRUE)
   omim <- load_files(metric_table, 'Type', 'Cluster_omim_reactome_0.05', TRUE)
+  patient <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_reactome_0.05', TRUE)
 
   for (i in 1:length(reactome$Term)){
     url <- paste0("https://reactome.org/content/detail/", reactome$Term[i])
