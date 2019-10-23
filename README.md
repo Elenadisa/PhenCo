@@ -16,10 +16,11 @@ PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorb
 **I** Clone this repository. Ensure that the option --recurse-submodules is used to download the submodule
 
 ``
-git clone https://github.com/Elenadisa/PhenCo
-``   
+git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
+``
+
 **II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
-**III** Install [AutoFlow] (https://github.com/seoanezonjic/autoflow) and [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) using the following code:
+**III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow) and [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) using the following code:
 
 ``
 gem install Autoflow
@@ -28,6 +29,7 @@ gem install PETS
 ``
 
 **V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
+
 ``
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   
 ``.   
@@ -37,12 +39,13 @@ python3 get-pip.py
 ``
 pip3 install optparse-pretty numpy os.path2
 ``    
-**VI** Instal [R](https://cloud.r-project.org/) and the following R packages:  
+**VI** Instal [R](https://cloud.r-project.org/). The following R packages must also be installed:  
 ``
 install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra', 'rmarkdown'))  
 ``. 
+Furthermore, these bioconductor packages should be installed via the BiocManager 
 ``
-BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))  
+::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))  
 `` 
 
 ## Usage
