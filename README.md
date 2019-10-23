@@ -14,11 +14,13 @@ PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorb
 ### Installation in Linux
 
 **I** Clone this repository. Ensure that the option --recurse-submodules is used to download the submodule
+
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``   
 **II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
 **III** Install [AutoFlow] (https://github.com/seoanezonjic/autoflow) and [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) using the following code:
+
 ``
 gem install Autoflow
 gem install NetAnalyzer
