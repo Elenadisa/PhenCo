@@ -2,7 +2,7 @@
   
 PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorbidity of patients cohorts. Rare diseases can have complex phenotypes and be hard to diagnose. Genetic and molecular analysis is made difficult by the small numbers of affected patients. Phenotypic comorbidity analysis can help rectify this by combining information from patients with similar phenotypes and looking for overlap in terms of shared genes and underlying functional systems. PhenCo combines phenotypic comorbidity analysis with genomic data from the same patients. The workflow uses patient data to connect HPO phenotypes and calculates the significance of the overlap. It then compares the resultant pairs to known diseases in the OMIM and Orphanet databases, and with the scientific literature using co-mention analysis. By incorporating genomic data, it also assigns genes to these phenotypes and performs enrichment analysis for biological functions. Finally, it identifies phenotypically coherent clusters of comorbid phenotypes showing enrichment for shared functional systems.
   
-## Requeriments
+## Requirements
 
 * Python 3. 
 * Ruby 2.4.1. 
@@ -13,14 +13,19 @@ PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorb
 
 ### Installation in Linux
 
-**I** Clone this repository:
+**I** Clone this repository. Ensure that the option --recurse-submodules is used to download the submodule
 ``
 git clone https://github.com/Elenadisa/PhenCo
 ``   
 **II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
-**III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow).   
-**IV** Install [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer).   
-**V** Install [Python 3](https://www.python.org/downloads/) and install the following librarys:  
+**III** Install [AutoFlow] (https://github.com/seoanezonjic/autoflow) and [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) using the following code:
+``
+gem install Autoflow
+gem install NetAnalyzer
+gem install PETS
+``
+
+**V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
 ``
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   
 ``.   
