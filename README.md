@@ -1,6 +1,8 @@
 # PhenCo Version 1.0
   
-PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorbidity of patients cohorts. Rare diseases can have complex phenotypes and be hard to diagnose. Genetic and molecular analysis is made difficult by the small numbers of affected patients. Phenotypic comorbidity analysis can help rectify this by combining information from patients with similar phenotypes and looking for overlap in terms of shared genes and underlying functional systems. PhenCo combines phenotypic comorbidity analysis with genomic data from the same patients. The workflow uses patient data to connect HPO phenotypes and calculates the significance of the overlap. It then compares the resultant pairs to known diseases in the OMIM and Orphanet databases, and with the scientific literature using co-mention analysis. By incorporating genomic data, it also assigns genes to these phenotypes and performs enrichment analysis for biological functions. Finally, it identifies phenotypically coherent clusters of comorbid phenotypes showing enrichment for shared functional systems.
+PhenCo is a workflow built in Autoflow that enables the user to search for clusters of comorbid phenotypes in a patient cohort based on co-occurrence between patients. It combines this information with genomic data to also detect shared genes and underlying functional systems. 
+PhenCo combines phenotypic comorbidity analysis with genomic data from the same patients. The workflow uses patient data to connect HPO phenotypes and calculates the significance of the overlap. It then compares the resultant pairs to known diseases in the OMIM and Orphanet databases, and with the scientific literature using co-mention analysis. 
+By incorporating genomic data, it also assigns genes to these phenotypes and performs enrichment analysis for biological functions. Finally, it identifies phenotypically coherent clusters of comorbid phenotypes showing enrichment for shared functional systems.
   
 ## Requirements
 
@@ -13,15 +15,15 @@ PhenCo is a workflow built in Autoflow that enables to analyse phenotypic comorb
 
 ### Installation in Linux
 
-**I** Clone this repository. Ensure that the option --recurse-submodules is used to download the submodule
+**I** Clone this repository. Ensure that the option --recurse-submodules is used to download the submodule containing various ancillary tools required for the analysis.
 
 ``
 git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
 ``
 
-**II** Install [Ruby](https://rvm.io/) We recommend to use the RVM manager.  
+**II** Install [Ruby](https://rvm.io/) We recommend using the RVM manager.  
 
-**III** Install [AutoFlow](https://github.com/seoanezonjic/autoflow) and [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) using the following code:
+**III** Install the ruby gems [AutoFlow](https://github.com/seoanezonjic/autoflow), [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) and PETS the following code:
 
 ``
 gem install Autoflow
