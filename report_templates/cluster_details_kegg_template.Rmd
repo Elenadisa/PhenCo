@@ -3,10 +3,11 @@
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
   metric_table <- data[['more-spec_table_metrics.txt']]
   library(dplyr)
+  library(igraph)
   
 
 #Load files from a metric file
-  load_files <- function(data, column_names, path_column, header){
+  load_files_tab <- function(data, column_names, path_column, header){
         factor_columns <- match(column_names, names(data))
         factor_combinations <- unique(data[column_names])
         
@@ -24,6 +25,28 @@
            return(files)     
         }
     
+
+  load_files <- function(data, column_names, path_column, header){
+        factor_columns <- match(column_names, names(data))
+        factor_combinations <- unique(data[column_names])
+        
+        for(row in 1:nrow(factor_combinations)){
+                combination <- as.vector(t((factor_combinations[row,]))) #extract row AND convert to vector
+                check_combination <- data[factor_columns] == combination[col(data[factor_columns])]
+                paths <- data[[path_column]][which(apply(check_combination, 1, sum) == length(combination))]
+                
+                for (file_path in paths){
+                  files <- read.table(file_path, sep=" ", header=header, quote="", stringsAsFactors = FALSE)
+                    
+                  }
+                
+                }
+           return(files)     
+        }
+
+
+
+ 
 #Function which group different dataframes by Clusters
    
     group_cluster_information <- function(df1, df2, df3, df4){
@@ -69,21 +92,7 @@
           
           all_groups[["omim"]] <- omim_groups_ordered
         }
-        patient_groups <- filter(df4, Cluster == clusters[i])
-        if (nrow(patient_groups) != 0){
-          patient_vector_length <- c()
-          
-          for(patient in 1:length(patient_groups$shared_hpos)){
-            nb <- strsplit(patient_groups$shared_hpos[patient], ", ")[[1]]
-            patient_vector_length[patient] <- length(nb)
-          }
-          
-          patient_index <- with(patient_groups, order(patient_vector_length, decreasing = TRUE))
-          patient_groups_ordered <- patient_groups[patient_index,]
-          rownames(patient_groups_ordered) <- NULL
 
-          all_groups[["patient"]] <- patient_groups_ordered
-        }
         name <- paste0("Cluster_", i)
         all_clusters[[name]] <- all_groups 
         }
@@ -101,10 +110,9 @@
 
 #Load files add add hyperlinks
   
-  hpo <- load_files(metric_table, 'Type', 'Cluster_hpo_kegg_0.05', TRUE)
-  kegg <- load_files(metric_table, 'Type', 'Cluster_kegg_0.05', TRUE)
-  omim <- load_files(metric_table, 'Type', 'Cluster_omim_kegg_0.05', TRUE)
-  patient <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_kegg_0.05', TRUE)
+  hpo <- load_files_tab(metric_table, 'Type', 'Cluster_hpo_kegg_0.05', TRUE)
+  kegg <- load_files_tab(metric_table, 'Type', 'Cluster_kegg_0.05', TRUE)
+  omim <- load_files_tab(metric_table, 'Type', 'Cluster_omim_kegg_0.05', TRUE)
   
   for (i in 1:length(kegg$Term)){
     url <- paste0("https://www.genome.jp/dbget-bin/www_bget?pathway+", kegg$Term[i])
@@ -123,6 +131,10 @@
     omim$Term[i] <- text_spec(omim$Term[i], link = url)
   }
 
+#clusters_file
+clusters_file_cytoscape <- load_files(metric_table, 'Type', 'cytoscape_file_kegg_0.05', FALSE)
+clusters_file <- clusters_file_cytoscape[,c(1,3,5)]
+colnames(clusters_file) <- c("HPO-A", "HPO-B", "Cluster")
 
 #Group data by cluster
 
@@ -145,10 +157,17 @@
   for(i in 1:length(ordered_clusters)){
     list <- ordered_clusters[[i]]
     cluster_name <- unlist(strsplit(names(ordered_clusters[i]), "_"))
+    cluster_number <- cluster_name[2]
     if(!is.null(list[["kegg"]]) & !is.null(list[["omim"]])){
       cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
       list["coherence_score"] <- NULL
       cat("# ", cluster_name, "\n")
+
+      cluster <- subset(clusters_file, Cluster == cluster_number)
+      hpo_names <- subset(hpo, Cluster == cluster_number)
+      g <- graph.data.frame(cluster, directed = FALSE)
+      plot(g, vertex.label=gsub(" ", "\n", hpo_names$Name), vertex.shape="none", vertex.label.cex=c(0.9), vertex.label.color="black")
+
       for(i in list){
         print(knitr::kable(i, format="markdown"))
         cat("\n")
@@ -161,10 +180,17 @@
   for(i in 1:length(ordered_clusters)){
     list <- ordered_clusters[[i]]
     cluster_name <- unlist(strsplit(names(ordered_clusters[i]), "_"))
+    cluster_number <- cluster_name[2]
     if(!is.null(list[["kegg"]]) & is.null(list[["omim"]])){
       cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
       list["coherence_score"] <- NULL
       cat("# ", cluster_name, "\n")
+
+      cluster <- subset(clusters_file, Cluster == cluster_number)
+      hpo_names <- subset(hpo, Cluster == cluster_number)
+      g <- graph.data.frame(cluster, directed = FALSE)
+      plot(g, vertex.label=gsub(" ", "\n", hpo_names$Name), vertex.shape="none", vertex.label.cex=c(0.9), vertex.label.color="black")
+
       for(i in list){
         print(knitr::kable(i, format="markdown"))
         cat("\n")
@@ -177,10 +203,17 @@
   for(i in 1:length(ordered_clusters)){
     list <- ordered_clusters[[i]]
     cluster_name <- unlist(strsplit(names(ordered_clusters[i]), "_"))
+    cluster_number <- cluster_name[2]
     if(is.null(list[["kegg"]]) & !is.null(list[["omim"]])){
       cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
       list["coherence_score"] <- NULL
       cat("# ", cluster_name, "\n")
+
+      cluster <- subset(clusters_file, Cluster == cluster_number)
+      hpo_names <- subset(hpo, Cluster == cluster_number)
+      g <- graph.data.frame(cluster, directed = FALSE)
+      plot(g, vertex.label=gsub(" ", "\n", hpo_names$Name), vertex.shape="none", vertex.label.cex=c(0.9), vertex.label.color="black")
+
       for(i in list){
         print(knitr::kable(i, format="markdown"))
         cat("\n")
@@ -192,16 +225,24 @@
 
   for(i in 1:length(ordered_clusters)){
     list <- ordered_clusters[[i]]
-    cluster_name <- names(ordered_clusters[i])
+    cluster_name <- unlist(strsplit(names(ordered_clusters[i]), "_"))
+    cluster_number <- cluster_name[2]
     if(is.null(list[["kegg"]]) & is.null(list[["omim"]])){
       cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
       list["coherence_score"] <- NULL
       cat("# ", cluster_name, "\n")
+
+      cluster <- subset(clusters_file, Cluster == cluster_number)
+      hpo_names <- subset(hpo, Cluster == cluster_number)
+      g <- graph.data.frame(cluster, directed = FALSE)
+      plot(g, vertex.label=gsub(" ", "\n", hpo_names$Name), vertex.shape="none", vertex.label.cex=c(0.9), vertex.label.color="black")
+
       for(i in list){
         print(knitr::kable(i, format="markdown"))
         cat("\n")
       }
     }
   }
+
 
 ```
