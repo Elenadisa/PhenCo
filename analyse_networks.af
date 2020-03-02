@@ -140,6 +140,8 @@ clustering_analysis_[kegg;go;reactome]){
 		clustering.R -i !term_pairs_enrichment_analysis_*!/valid_pairs_(*)_$PVALUE -n clusters_file_(*)_$PVALUE -t $net_name -s summary_dendograme_(*)_$PVALUE.png -d top_connected_nodes_(*)_$PVALUE.png -r relationship_between_communities_(*)_$PVALUE.png -c cytoscape_file_(*)_$PVALUE
 		calculate_cluster_average.py -c clusters_file_(*)_$PVALUE -A 1 -B 0 -e (*) -p $PVALUE -m $net_type -n $net_name >> ../metrics
 		
+		echo -e "$net_name\t$net_type\tcytoscape_file_(*)_$PVALUE\t`pwd`/cytoscape_file_(*)_$PVALUE" >> ../metrics
+
 		#Look Cluster overlap of clusters HPOS with diseases HPOs
 			#OMIM
 		cluster_diseases_merger.py -a clusters_file_(*)_$PVALUE -A 1 -x 0 -b obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair)/OMIM_disease_dictionary -B 0 -y 1 -t 0 > relations_OMIM_(*)_$PVALUE
