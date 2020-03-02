@@ -28,15 +28,14 @@ cp $results_source/more_spec/metrics results/more-spec_metrics
 create_metric_table.rb results/more-spec_metrics 'Name,Type' results/more-spec_table_metrics.txt
 
 #Create Report
-create_report.R -t report_templates/article_figures.Rmd -o results/Article_Figures.html -d results/table_metrics.txt -H t
+create_report.R -t report_templates/pairs_report_template.Rmd -o results/S1_Report_pairs_report.html -d results/table_metrics.txt -H t
+create_report.R -t report_templates/clustering_report_template.Rmd -o results/S2_Report_clustering_report.html -d results/table_metrics.txt -H t
 
-create_report.R -t report_templates/pairs_report_template.Rmd -o results/pairs_report.html -d results/table_metrics.txt -H t
-create_report.R -t report_templates/clustering_report_template.Rmd -o results/clustering_report.html -d results/table_metrics.txt -H t
+create_report.R -t report_templates/cluster_details_go_template.Rmd -o results/S3_Report_cluster_details_go.html -d results/more-spec_table_metrics.txt -H t
+create_report.R -t report_templates/cluster_details_reactome_template.Rmd -o results/S4_Report_cluster_details_reactome.html -d results/more-spec_table_metrics.txt -H t
+create_report.R -t report_templates/cluster_details_kegg_template.Rmd -o results/S5_Report_cluster_details_kegg.html -d results/more-spec_table_metrics.txt -H t
 
-create_report.R -t report_templates/cluster_details_go_template.Rmd -o results/cluster_details_go.html -d results/more-spec_table_metrics.txt -H t
-create_report.R -t report_templates/cluster_details_kegg_template.Rmd -o results/cluster_details_kegg.html -d results/more-spec_table_metrics.txt -H t
-create_report.R -t report_templates/cluster_details_reactome_template.Rmd -o results/cluster_details_reactome.html -d results/more-spec_table_metrics.txt -H t
+create_report.R -t report_templates/patient_details_template.Rmd -o results/S6_Report_patient_details.html -d results/more-spec_table_metrics.txt -H t
 
-create_report.R -t report_templates/patient_details_template.Rmd -o results/patient_details.html -d results/more-spec_table_metrics.txt -H t
-
+create_report.R -t report_templates/article_figures.Rmd -o results/S7_Report_Article_Figures.html -d results/table_metrics.txt -H t
 
