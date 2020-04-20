@@ -25,18 +25,23 @@
         }
 
 #Function which group different dataframes by patients   
-    group_patient_information <- function(df1, df2){
+    group_patient_information <- function(df1, df2, df3){
       patients <- unique(df1$Patient)
       all_patients <- list()
 
       for (i in patients){
         all_groups <- list()
-        hp_groups <- filter(df1, Patient == i)
+        summary_groups <- filter(df1, Patient == i)
+        if (nrow(summary_groups) != 0){
+          all_groups[["sumary"]] <- summary_groups
+        }
+
+        hp_groups <- filter(df2, Patient == i)
         if (nrow(hp_groups) != 0){
           all_groups[["hpo"]] <- hp_groups
         }
 
-        system_groups <- filter(df2, Patient == i)
+        system_groups <- filter(df3, Patient == i)
         if (nrow(system_groups) != 0){
           all_groups[["system"]] <- system_groups
           phenotypes_vector_length <- c()
@@ -85,6 +90,53 @@
       return(plt)
     }
 
+  get_specific_go_terms <- function(df){
+    library(GOSim)
+    library(GO.db)
+    
+    #Get child terms
+    setOntology(ont = "BP")
+    go_l <- getChildren()
+
+    #load final dataframe
+    df1 <- data_frame()
+    
+    #Get patient list
+    patient_l <- unique(df$Patient)
+    
+    #For each patient get the overlapping clusters
+    for (patient in patient_l){
+      patient_groups <- filter(df, Patient == patient)  
+      clusters_l <- unique(patient_groups$Cluster)
+      
+      #For each cluster, get the overlapping systems
+      for (cluster in clusters_l){
+        clusters_groups <- filter(patient_groups, Cluster == cluster)
+        system_l <- unique(clusters_groups$Systems)
+        child_l <- c()
+        
+        #If there are more than one system get the child terms of each system and load them in a list
+        if (length(system_l) > 1){
+          for(system in system_l){
+            child_l <- c(child_l, go_l[[system]])
+          }
+          #If a child term is the list of system in the cluster, eliminate the line in the df. Finally store the final df in the final df
+          for (child in child_l){
+            if(child %in% system_l){
+              clusters_groups <- (clusters_groups[!clusters_groups$Systems == child, ])
+            }
+          }
+          df1 <- rbind(df1, clusters_groups)
+        #If the cluster only have one system load the df to the final df
+        }else{
+          df1 <- rbind(df1, clusters_groups)
+        }
+        
+      }
+    }
+    return(df1)
+  }
+
 ```
 
 ## Summary tables
@@ -132,7 +184,7 @@ kable(t(reactome_df))
 ## Number of cluster vs number of HPO per patient  
 
 
-```{r  echo=FALSE, warning=FALSE, message=FALSE}
+```{r  echo=FALSE, warning=FALSE, message=FALSE, dpi=600, res=500}
   
   all_data_table <- load_files(metric_table, 'Type', 'patients_systems_cases', TRUE)
   produce_scatterplot(all_data_table, "Prof_length", "Nº_coincedence_clusters", "Number of HPO per patient", "Number of clusters", add=TRUE)
@@ -150,17 +202,21 @@ kable(t(reactome_df))
 
 #Load files and add hyperlinks
   
-  hpo <- load_files(metric_table, 'Type', 'patient_hpo_genes_go_0.05', TRUE)
+  hpo <- load_files(metric_table, 'Type', 'patient_hpo_coincident_with_clusters', FALSE)
+  colnames(hpo) <- c("Patient", "HPO", "Name", "Genes")
 
-  go <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_go_0.05', TRUE)
+  summary <- load_files(metric_table, 'Type', 'patient_overlap_summary', TRUE)
+
+  go_df <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_diseases_go_0.05', TRUE)
+  go <- get_specific_go_terms(go_df)
   if(nrow(go) > 0){  
     for (i in 1:length(go$Systems)){
       url <- paste0("http://amigo.geneontology.org/amigo/term/", go$Systems[i])
       go$Systems[i] <- text_spec(go$Systems[i], link = url)
     }
-  }  
-
-  reactome <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_reactome_0.05', TRUE)
+  }
+  
+  reactome <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_diseases_reactome_0.05', TRUE)
   if(nrow(reactome) > 0){  
     for (i in 1:length(reactome$Systems)){
       url <- paste0("https://reactome.org/content/detail/", reactome$Systems[i])
@@ -168,12 +224,11 @@ kable(t(reactome_df))
     }
   }
 
-  kegg <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_kegg_0.05', TRUE)
-
+  kegg <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_diseases_kegg_0.05', TRUE)
   if(nrow(kegg) > 0){
     for (i in 1:length(kegg$Systems)){
-      url <- paste0("https://www.genome.jp/dbget-bin/www_bget?pathway+", kegg$Term[i])
-      kegg$Term[i] <- text_spec(kegg$Term[i], link = url)
+      url <- paste0("https://www.genome.jp/dbget-bin/www_bget?pathway+", kegg$Systems[i])
+      kegg$Systems[i] <- text_spec(kegg$Systems[i], link = url)
     }
   }
   
@@ -183,7 +238,7 @@ kable(t(reactome_df))
   
 #Group by patients
 
-all_patients <- group_patient_information(hpo, systems)
+all_patients <- group_patient_information(summary, hpo, systems)
 
 #Order by phenotype overlap 
 length_vector <- c()
@@ -198,17 +253,23 @@ ordered_patients <- all_patients[order(unlist(length_vector), decreasing=TRUE)]
 #Print data
 for(i in 1:length(ordered_patients)){
   list <- ordered_patients[[i]]
-  cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
-  patient_name <- unlist(strsplit(names(ordered_patients[i]), "_"))
-  cat("# ", patient_name, "\n")
-  list$phenotype_length <- NULL
-  for(i in list){
-    print(knitr::kable(i, format="markdown"))
-    cat("\n")
-    }
+  if (length(list) == 4){
+    cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
+    patient_name <- unlist(strsplit(names(ordered_patients[i]), "_"))
+    cat("# ", patient_name, "\n")
+  
+    list$phenotype_length <- NULL
+    for(i in list){
+      print(knitr::kable(i, format="markdown"))
+      cat("\n")
+    }  
+  }
+  
 }
 
     
 
+
+  
 
 ```
