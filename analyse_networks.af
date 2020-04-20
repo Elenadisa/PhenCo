@@ -277,6 +277,10 @@ clustering_metrics_[kegg;go;reactome]){
         merge_patient_hpo_gene.py -p $phen2pat -A 0 -a 1 -f $term2gene_dictionary -B 0 -b 1 -g $pat2gene -C 0 -c 1 -n $HPO_table -D 0 -d 1 -s $entrez2gene_symbol -E 0 -e 1 > patient_hpo_genes_(*)_$PVALUE
         echo -e "$net_name\t$net_type\tpatient_hpo_genes_(*)_$PVALUE\t`pwd`/patient_hpo_genes_(*)_$PVALUE" >> ../metrics
 
+        cut -f 1 !clustering_analysis_*!/relations_OMIM_missing_1_enrich_70_percent_(*)_$PVALUE | sort -u > clusters_to_OMIM_disease_(*)_$PVALUE
+        filter_data.py -l clusters_to_OMIM_disease_(*)_$PVALUE -i patient_coincidence_with_clusters_and_gene_systems_(*)_$PVALUE -c 1 > patient_coincidence_with_clusters_and_gene_systems_diseases_(*)_$PVALUE
+        echo -e "$net_name\t$net_type\tpatient_coincidence_with_clusters_and_gene_systems_diseases_(*)_$PVALUE\t`pwd`/patient_coincidence_with_clusters_and_gene_systems_diseases_(*)_$PVALUE" >> ../metrics
+
 
 
 	done
