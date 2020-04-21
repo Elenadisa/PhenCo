@@ -25,7 +25,7 @@
         }
 
 #Function which group different dataframes by patients   
-    group_patient_information <- function(df1, df2, df3){
+    group_patient_information <- function(df1, df2, df3, df4){
       patients <- unique(df1$Patient)
       all_patients <- list()
 
@@ -34,6 +34,10 @@
         summary_groups <- filter(df1, Patient == i)
         if (nrow(summary_groups) != 0){
           all_groups[["sumary"]] <- summary_groups
+        }
+        gene_groups <- filter(df4, Patient == i)
+        if (nrow(gene_groups) != 0){
+          all_groups[["gene"]] <- gene_groups
         }
 
         hp_groups <- filter(df2, Patient == i)
@@ -203,9 +207,12 @@ kable(t(reactome_df))
 #Load files and add hyperlinks
   
   hpo <- load_files(metric_table, 'Type', 'patient_hpo_coincident_with_clusters', FALSE)
-  colnames(hpo) <- c("Patient", "HPO", "Name", "Genes")
+  colnames(hpo) <- c("Patient", "HPO", "Name")
 
   summary <- load_files(metric_table, 'Type', 'patient_overlap_summary', TRUE)
+
+  genes <- load_files(metric_table, 'Type', 'pat2gene', FALSE)
+  colnames(genes) <- c("Patient", "Gene list from patient CNV")
 
   go_df <- load_files(metric_table, 'Type', 'patient_coincidence_with_clusters_and_gene_systems_diseases_go_0.05', TRUE)
   go <- get_specific_go_terms(go_df)
@@ -238,7 +245,7 @@ kable(t(reactome_df))
   
 #Group by patients
 
-all_patients <- group_patient_information(summary, hpo, systems)
+all_patients <- group_patient_information(summary, hpo, systems, genes)
 
 #Order by phenotype overlap 
 length_vector <- c()
@@ -253,7 +260,7 @@ ordered_patients <- all_patients[order(unlist(length_vector), decreasing=TRUE)]
 #Print data
 for(i in 1:length(ordered_patients)){
   list <- ordered_patients[[i]]
-  if (length(list) == 4){
+  if (length(list) == 5){
     cat("_ _ _", "\n", "_ _ _", "\n", "_ _ _", "\n")
     patient_name <- unlist(strsplit(names(ordered_patients[i]), "_"))
     cat("# ", patient_name, "\n")
