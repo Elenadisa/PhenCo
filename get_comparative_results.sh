@@ -25,11 +25,14 @@ cat $results_source/*/metrics > results/all_metrics
 create_metric_table.rb results/all_metrics_renamed 'Name,Type' results/table_metrics.txt
 
 cp $results_source/more_spec/metrics results/more-spec_metrics
-patient=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks/more_spec/patient_cluster_merger.py_0001/patient_hpo_genes_go_0.05
-go=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks/more_spec/patient_cluster_merger.py_0001/patient_coincidence_with_clusters_and_gene_systems_go_0.05
-kegg=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks/more_spec/patient_cluster_merger.py_0000/patient_coincidence_with_clusters_and_gene_systems_kegg_0.05
-reactome=/mnt/scratch/users/bio_267_uma/elenads/test1/analysed_unenriched_networks/more_spec/patient_cluster_merger.py_0002/patient_coincidence_with_clusters_and_gene_systems_reactome_0.05
-get_patient_hpo_in_clusters.py -p $patient -A 0 -a 1 -g $go -r $reactome -k $kegg -B 0 -b 2 -o results/patient_overlap_summary > results/patient_hpo_coincident_with_clusters
+patient=$results_source"/more_spec/patient_cluster_merger.py_0001/patient_hpo_genes_go_0.05"
+go=$result_source"/more_spec/patient_cluster_merger.py_0001/patient_coincidence_with_clusters_and_gene_systems_go_0.05"
+kegg=$result_source"/more_spec/patient_cluster_merger.py_0001/patient_coincidence_with_clusters_and_gene_systems_kegg_0.05"
+reactome=$result_source"/more_spec/patient_cluster_merger.py_0001/patient_coincidence_with_clusters_and_gene_systems_reactome_0.05"
+pat2gene=$build_results_source"/NetAnalyzer.rb_0000/pat2gene_symbol"
+pat2gene_l=$build_results_source"/NetAnalyzer.rb_0000/pat2gene_symbol_l"
+
+get_patient_hpo_in_clusters.py -p $patient -A 0 -a 1 -g $go -r $reactome -k $kegg -B 0 -b 2 -D 5 -f $pat2gene -C 0 -c 1 -o results/patient_overlap_summary > results/patient_hpo_coincident_with_clusters
 echo -e "more_spec\tmore_spec\tpatient_overlap_summary\t`pwd`/results/patient_overlap_summary" >> results/more-spec_metrics
 echo -e "more_spec\tmore_spec\tpatient_hpo_coincident_with_clusters\t`pwd`/results/patient_hpo_coincident_with_clusters" >> results/more-spec_metrics
 create_metric_table.rb results/more-spec_metrics 'Name,Type' results/more-spec_table_metrics.txt
