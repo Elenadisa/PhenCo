@@ -25,6 +25,7 @@ build_phen_gene_network){
 	
 	parse_patients_loci_to_genes.py -p pat2loci -A 0 -a 1 -l loci2gene -B 0 -b 1 | sort -u > pat2gene
 	parse_entrezid_to_symbol.R -i pat2gene -o entrez2gene_symbol
+	translate_gene_id_to_symbol.py -p pat2gene -d entrez2gene_symbol -A 0 -a 1 -o pat2gene_symbol_l > pat2gene_symbol
 }
 
 build_phen_phen_network){
