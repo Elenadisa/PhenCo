@@ -34,11 +34,13 @@ gem install NetAnalyzer
 ``
 gem install pets  
 ``  
-  
+
 **V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
 
 ``
 sudo apt update
+``  
+``
 sudo apt -y upgrade  
 ``   
 ``
