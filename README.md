@@ -27,10 +27,13 @@ git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
 
 ``
 gem install autoflow  
+``
+``
 gem install NetAnalyzer  
+``
+``
 gem install pets  
 ``
-
 **V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
 
 ``
