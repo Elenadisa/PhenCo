@@ -24,16 +24,17 @@ git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
 **II** Install [Ruby](https://rvm.io/) We recommend using the RVM manager.  
 
 **III** Install the ruby gems [AutoFlow](https://github.com/seoanezonjic/autoflow), [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) and PETS the following code:
-
+  
 ``
 gem install autoflow  
-``
+``  
 ``
 gem install NetAnalyzer  
-``
+``  
 ``
 gem install pets  
-``
+``  
+  
 **V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
 
 ``
