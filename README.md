@@ -125,3 +125,6 @@ The templetes have to be executed in a certain order.
 
 
 ## Citation
+
+Phenotype-genotype comorbidity analysis of patients with rare disorders provides insight into their pathological and molecular bases
+Díaz-Santiago E, Jabato FM, Rojano E, Seoane P, Pazos F, et al. (2020) Phenotype-genotype comorbidity analysis of patients with rare disorders provides insight into their pathological and molecular bases. PLOS Genetics 16(10): e1009054. https://doi.org/10.1371/journal.pgen.1009054
