@@ -26,28 +26,32 @@ git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
 **III** Install the ruby gems [AutoFlow](https://github.com/seoanezonjic/autoflow), [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) and PETS the following code:
 
 ``
-gem install Autoflow
-gem install NetAnalyzer
-gem install PETS
+gem install autoflow  
+gem install NetAnalyzer  
+gem install pets  
 ``
 
 **V** Install [Python 3](https://www.python.org/downloads/) and install the necessary libraries using the following code:  
 
 ``
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py   
-``.   
+sudo apt update
+sudo apt -y upgrade  
+``   
 ``
-python3 get-pip.py   
-``.   
+sudo apt install -y python3-pip
+``   
 ``
 pip3 install optparse-pretty numpy os.path2
 ``    
 
 **VI** Instal [R](https://cloud.r-project.org/). The following R packages must also be installed:  
 
+Start R in the terminal and install the packages:    
+
 ``
+sudo -i R  
 install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra', 'rmarkdown', 'BiocManager'))
-``. 
+`` 
 
 Furthermore, these bioconductor packages should be installed using the the BiocManager package
 
