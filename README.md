@@ -56,8 +56,10 @@ Start R in the terminal and install the packages:
 
 ``
 sudo -i R  
+``   
+``
 install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm', 'igraph', 'kableExtra', 'rmarkdown', 'BiocManager'))
-`` 
+``  
 
 Furthermore, these bioconductor packages should be installed using the the BiocManager package
 
