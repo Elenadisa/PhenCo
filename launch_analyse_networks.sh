@@ -1,11 +1,11 @@
 #! /usr/bin/env bash
 
-source ~soft_bio_267/initializes/init_autoflow
+#source ~soft_bio_267/initializes/init_autoflow
 
 current_dir=`pwd`
 
 #PATH TO build_networks.sh RESULTS
-data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_nets
+data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 #PATH TO DIRECTORY WITH PAIRS LISTS
 networks_source=$data_source"/ln_0000/working_networks"
 #PATH TO GENES DATA
@@ -29,7 +29,7 @@ OMIM_diseases=$current_dir'/processed_data/omim_dictionary'
 HPO2pubmed_file=$current_dir'/processed_data/HPO2pubmed'
 
 
-source ~soft_bio_267/initializes/init_autoflow
+#source ~soft_bio_267/initializes/init_autoflow
 
 
 ls $networks_source > working_nets
