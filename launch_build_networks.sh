@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 
 #Initialize autoflow
-source ~soft_bio_267/initializes/init_autoflow
+#source ~soft_bio_267/initializes/init_autoflow
 current_dir=`pwd`
 
-module load python/anaconda-3_440
+#module load python/anaconda-3_440
 
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
@@ -36,17 +36,17 @@ mkdir processed_data
 
 # Here we include code to parse an input file from DECIPHER and obtain the correct input file for the  workflow
 input_file_path=/PATH/TO/INPUT/FILE
-echo -e  "Total_of_patients\t`cut -f 1 $decipher_file_path | sort -u | wc -l ` " > processed_data/build_metrics
+echo -e  "Total_of_patients\t`cut -f 1 $input_file_path | sort -u | wc -l ` " > processed_data/build_metrics
 echo -e "HP:0000001\nHP:0000118" > processed_data/list_of_hpo_to_exclude.txt
 # Convert DECIPHER format to our processing format
  #[1] : Patient [2]: Chr [3]: Start [4]: End [5]: HPO_Name/Code
-awk 'BEGIN { FS = "\t" } {if ($9 != "" && $6 ~ /De novo/ ) { print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $9}}' $decipher_file_path  > processed_data/patient_data.txt
+awk 'BEGIN { FS = "\t" } {if ($9 != "" && $6 ~ /De novo/ ) { print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $9}}' $input_file_path  > processed_data/patient_data.txt
 
 # Create HPOs dictionary
 parse_hpo_file.rb external_data/hp.obo > processed_data/hpo2name.txt
 get_table_ontology.rb external_data/hp.obo name,synonym | cut -f 1,2  > processed_data/HPO_table.txt 
 
-source ~soft_bio_267/initializes/init_pets
+#source ~soft_bio_267/initializes/init_pets
 
 # About parental enrichment
 #	-r 'none' => no enrichment, -r 'root' => enrichment
@@ -126,10 +126,10 @@ variables=`echo -e "
 " | tr -d [:space:]`
 
 
-#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_nets -V $variables -m 2gb $1 -n cal -t '10:00:00'
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 2gb $1 -n cal -t '10:00:00'
 
 #For enrichment analysis
-#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_nets -V $variables -m 16gb $1 -n cal -t '10:00:00'
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 16gb $1 -n cal -t '10:00:00'
 
 
 
