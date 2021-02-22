@@ -61,12 +61,23 @@ do
 	" | tr -d [:space:]`
 
 	#For KEGG and REACTOME ENRICHMENT ANALYSIS	
+		#SLURM system
 	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -m 8gb -t '7-00:00:00' -n 'cal'
+
+		#Linux system
+	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -b
 	
 	#For GO ENRICHMENT ANALYSIS
+		#SLURM system
 	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -m 16gb -t '7-00:00:00' -n 'cal'
+		#Linux system
+	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -b
 	
+	#For other analysys
+		#SLURM system
 	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -m 2gb -t '7-00:00:00' -n 'cal'
+		#Linux system
+	#AutoFlow -w analyse_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks/$NETWORK -V $variables $1 -b
 	
 	
 done < working_nets
