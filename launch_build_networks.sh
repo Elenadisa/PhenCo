@@ -57,10 +57,10 @@ get_network_nodes.rb -p external_data/hp.obo -e processed_data/list_of_hpo_to_ex
 # Pat-Phen pairs for Phen-Phen generation
 grep "HP:" processed_data/tripartite_network_unenriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_unenriched
 # Now either with no cut-off
-#cp processed_data/temp processed_data/patient2hpo_unenriched
+cp processed_data/temp processed_data/patient2hpo_unenriched
 # Or minimum 2 patients have an HPO
-# awk 'FNR==NR{a[$2]++;next} a[$2]>1'  temp temp > processed_data/patient2hpo_unenriched
-#rm temp
+ awk 'FNR==NR{a[$2]++;next} a[$2]>1'  temp temp > processed_data/patient2hpo_unenriched
+rm temp
 
 # Pat-Phen pairs for other parts - enriched and with no cut-off
 grep "HP:" processed_data/tripartite_network_enriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_enriched
@@ -86,16 +86,16 @@ calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_p
 
 #COMENTION ANALYSIS
 
-module unload libyaml
-module unload openssl
-module purge
-module load ruby/2.4.1
+#module unload libyaml
+#module unload openssl
+#module purge
+#module load ruby/2.4.1
 rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
 pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
-module purge
+#module purge
 
 
-source ~soft_bio_267/initializes/init_autoflow
+#source ~soft_bio_267/initializes/init_autoflow
 
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
@@ -125,11 +125,16 @@ variables=`echo -e "
 
 " | tr -d [:space:]`
 
-
+#SLURM system
 #AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 2gb $1 -n cal -t '10:00:00'
 
-#For enrichment analysis
+#linux
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -b
+
+#For enrichment analysis in SLURM system
 #AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 16gb $1 -n cal -t '10:00:00'
 
+#For enrichment analysis in linux
+#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -b
 
 
