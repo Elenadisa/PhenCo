@@ -23,7 +23,7 @@ git clone https://github.com/Elenadisa/PhenCo --recurse-submodules
 
 **II** Install [Ruby](https://rvm.io/) We recommend using the RVM manager.  
 
-**III** Install the ruby gems [AutoFlow](https://github.com/seoanezonjic/autoflow), [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) and PETS the following code:
+**III** Install the ruby gems [AutoFlow](https://github.com/seoanezonjic/autoflow), [NetAnalyzer](https://github.com/ElenaRojano/NetAnalyzer) and [PETS](https://rubygems.org/gems/pets) the following code:
   
 ``
 gem install autoflow  
@@ -66,6 +66,11 @@ Furthermore, these bioconductor packages should be installed using the the BiocM
 ``
 BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))  
 `` 
+
+### Input file format 
+
+A confidentially agreements necessary to use the DECIPHER patient data.  
+There is a test file with an example of the format that the input file must have (test_input.txt)  
 
 ## Usage
   
@@ -135,6 +140,9 @@ The templetes have to be executed in a certain order.
 **II** ./launch_analyse_networks.sh.   
 **III** ./get_comparative_results.sh.   
 
+### Run Autoflow  
+  
+PhenCo can be executed in a SLURM queue system and in linux systems. Use the autoflow code line that suits you.
 
 ## Citation
 
