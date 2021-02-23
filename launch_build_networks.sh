@@ -15,7 +15,7 @@ export PATH=$CODE_PATH'/scripts/py_scripts:'$PATH
 
 mkdir external_data
 
-wget 'ftp://ftp.ncbi.nih.gov/genomes/Homo_sapiens/GRCh37.p13_interim_annotation/interim_GRCh37.p13_top_level_2017-01-13.gff3.gz' -O external_data/genome.gz
+#wget 'ftp://ftp.ncbi.nih.gov/genomes/Homo_sapiens/GRCh37.p13_interim_annotation/interim_GRCh37.p13_top_level_2017-01-13.gff3.gz' -O external_data/genome.gz
 gunzip -d  external_data/genome.gz
 wget 'http://compbio.charite.de/jenkins/job/hpo.annotations.monthly/lastSuccessfulBuild/artifact/annotation/ALL_SOURCES_ALL_FREQUENCIES_phenotype_to_genes.txt' -O external_data/hpo_db.txt
 tail -n +2 external_data/hpo_db.txt | cut -f 1,3 > external_data/hpo_db_phen2gene.txt  
@@ -93,8 +93,8 @@ calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_p
 #module unload openssl
 #module purge
 #module load ruby/2.4.1
-rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
-pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
+#rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
+#pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
 #module purge
 
 
@@ -102,8 +102,8 @@ pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO
 
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
-mkdir /PATH/TO/OUTPUT/FILES/PhenCo
-mkdir /PATH/TO/OUTPUT/FILES/PhenCo/build_networks
+
+mkdir build_networks
 
 # PREPARE VARIABLES NEEDED IN build_networks.af
 
@@ -131,13 +131,9 @@ variables=`echo -e "
 #SLURM system
 #AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 2gb $1 -n cal -t '10:00:00'
 
-#linux
-#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -b
-
 #For enrichment analysis in SLURM system
 #AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 16gb $1 -n cal -t '10:00:00'
 
-#For enrichment analysis in linux
-#AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -b
-
+#linux
+#AutoFlow -w build_networks.af -o build_networks -V $variables -b
 
