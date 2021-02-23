@@ -16,7 +16,7 @@ export PATH=$CODE_PATH'/scripts/py_scripts:'$PATH
 mkdir external_data
 
 #wget 'ftp://ftp.ncbi.nih.gov/genomes/Homo_sapiens/GRCh37.p13_interim_annotation/interim_GRCh37.p13_top_level_2017-01-13.gff3.gz' -O external_data/genome.gz
-gunzip -d  external_data/genome.gz
+#gunzip -d  external_data/genome.gz
 wget 'http://compbio.charite.de/jenkins/job/hpo.annotations.monthly/lastSuccessfulBuild/artifact/annotation/ALL_SOURCES_ALL_FREQUENCIES_phenotype_to_genes.txt' -O external_data/hpo_db.txt
 tail -n +2 external_data/hpo_db.txt | cut -f 1,3 > external_data/hpo_db_phen2gene.txt  
 wget http://compbio.charite.de/jenkins/job/hpo.annotations/lastStableBuild/artifact/misc/phenotype_annotation.tab -O external_data/phenotype_annotation.tab
