@@ -103,7 +103,7 @@ calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_p
 
 #PATH TO THE DIRECTORY WHERE TO SAVE THE RESULTS
 
-mkdir build_networks
+mkdir  PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 
 # PREPARE VARIABLES NEEDED IN build_networks.af
 
@@ -135,5 +135,5 @@ variables=`echo -e "
 #AutoFlow -w build_networks.af -o PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -m 16gb $1 -n cal -t '10:00:00'
 
 #linux
-#AutoFlow -w build_networks.af -o build_networks -V $variables -b
+#AutoFlow -w build_networks.af -o  PATH/TO/OUTPUT/FILES/PhenCo/build_networks -V $variables -b
 
