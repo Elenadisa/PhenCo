@@ -37,7 +37,7 @@ mkdir processed_data
 # Here we include code to parse an input file from DECIPHER and obtain the correct input file for the  workflow
 #input_file_path=/PATH/TO/INPUT/FILE
 #Test input file 
-input_file_path=test_input.txt
+input_file_path=external_data/test_input.txt
 
 echo -e  "Total_of_patients\t`cut -f 1 $input_file_path | sort -u | wc -l ` " > processed_data/build_metrics
 echo -e "HP:0000001\nHP:0000118" > processed_data/list_of_hpo_to_exclude.txt
