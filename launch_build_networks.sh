@@ -59,9 +59,6 @@ get_network_nodes.rb -p external_data/hp.obo -e processed_data/list_of_hpo_to_ex
 grep "HP:" processed_data/tripartite_network_unenriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_unenriched
 # Now either with no cut-off
 cp processed_data/temp processed_data/patient2hpo_unenriched
-# Or minimum 2 patients have an HPO
- awk 'FNR==NR{a[$2]++;next} a[$2]>1'  temp temp > processed_data/patient2hpo_unenriched
-rm temp
 
 # Pat-Phen pairs for other parts - enriched and with no cut-off
 grep "HP:" processed_data/tripartite_network_enriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_enriched
@@ -85,12 +82,14 @@ grep -Fwf processed_data/relevant_HPOs processed_data/HPO_table.txt > processed_
 mkdir results
 calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_prevalence
 
-#COMENTION ANALYSIS
+#COMENTION ANALYSIS 		
 
 #module unload libyaml
 #module unload openssl
 #module purge
 #module load ruby/2.4.1
+
+#UNCOMMENT THE TWO FOLLOWING LINES TO RUN COMENTION ANALYSIS
 #rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
 #pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
 #module purge
