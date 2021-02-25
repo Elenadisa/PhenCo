@@ -57,8 +57,6 @@ get_network_nodes.rb -p external_data/hp.obo -e processed_data/list_of_hpo_to_ex
 
 # Pat-Phen pairs for Phen-Phen generation
 grep "HP:" processed_data/tripartite_network_unenriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_unenriched
-# Now either with no cut-off
-cp processed_data/temp processed_data/patient2hpo_unenriched
 
 # Pat-Phen pairs for other parts - enriched and with no cut-off
 grep "HP:" processed_data/tripartite_network_enriched.txt | awk '{print $2 "\t" $1}' > processed_data/patient2hpo_enriched
