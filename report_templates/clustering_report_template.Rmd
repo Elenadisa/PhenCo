@@ -77,11 +77,11 @@ To do this clustering analysis, we select those HPO pairs which have consistent 
 
 ### KEGG cluster analysis summary
 
-**Image 1: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0000/summary_dendograme_kegg_0.05.png)  
+**Image 1: Summary dendograme of clustering** ![](../results/clusters_summary_figures/summary_dendograme_kegg_0.05.png)  
 
-**Image 2: Top connected nodes** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0000/top_connected_nodes_kegg_0.05.png)  
+**Image 2: Top connected nodes** ![](../results/clusters_summary_figures/top_connected_nodes_kegg_0.05.png)  
 
-**Image 3: Relationships between communities** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0000/relationship_between_communities_kegg_0.05.png)  
+**Image 3: Relationships between communities** ![](../results/clusters_summary_figures/relationship_between_communities_kegg_0.05.png)  
   
 
 
@@ -196,11 +196,11 @@ kable(ddply(metric_table, .(Type), summarize, "Clusters number" = mean(clusters_
 
 ## Reactome cluster analysis summary  
 
-**Image 4: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0002/summary_dendograme_reactome_0.05.png)  
+**Image 4: Summary dendograme of clustering** ![](../results/clusters_summary_figures/summary_dendograme_reactome_0.05.png)  
 
-**Image 5: Top connected nodes** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0002/top_connected_nodes_reactome_0.05.png)  
+**Image 5: Top connected nodes** ![](../results/clusters_summary_figures/top_connected_nodes_reactome_0.05.png)  
 
-**Image 6: Relationships between communities** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0002/relationship_between_communities_reactome_0.05.png)  
+**Image 6: Relationships between communities** ![](../results/clusters_summary_figures/relationship_between_communities_reactome_0.05.png)  
   
 
 
@@ -318,11 +318,11 @@ kable(ddply(metric_table, .(Type), summarize, "Clusters number" = mean(clusters_
 
 ## GO cluster analysis summary
 
-**Image 7: Summary dendograme of clustering** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0001/summary_dendograme_go_0.05.png)  
+**Image 7: Summary dendograme of clustering** ![](../results/clusters_summary_figures/summary_dendograme_go_0.05.png)  
 
-**Image 8: Top connected nodes** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0001/top_connected_nodes_go_0.05.png)  
+**Image 8: Top connected nodes** ![](../results/clusters_summary_figures/top_connected_nodes_go_0.05.png)  
 
-**Image 9: Relationships between communities** ![](/mnt/scratch/users/bio_267_uma/elenads/analysed_both_networks/hypergeometric_phen_reliable_pairs/clustering.R_0001/relationship_between_communities_go_0.05.png)  
+**Image 9: Relationships between communities** ![](../results/clusters_summary_figures/relationship_between_communities_go_0.05.png)  
 
 
   
