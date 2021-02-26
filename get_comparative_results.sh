@@ -37,6 +37,18 @@ echo -e "more_spec\tmore_spec\tpatient_overlap_summary\t`pwd`/results/patient_ov
 echo -e "more_spec\tmore_spec\tpatient_hpo_coincident_with_clusters\t`pwd`/results/patient_hpo_coincident_with_clusters" >> results/more-spec_metrics
 create_metric_table.rb results/more-spec_metrics 'Name,Type' results/more-spec_table_metrics.txt
 
+#Cluster summary figures
+mkdir results/clusters_summary_figures
+cp $results_source"/more_spec/clustering.R_0000/summary_dendograme_kegg_0.05.png" results/clusters_summary_figures/summary_dendograme_kegg_0.05.png
+cp $results_source"/more_spec/clustering.R_0000/top_connected_nodes_kegg_0.05.png" results/clusters_summary_figures/top_connected_nodes_kegg_0.05.png
+cp $results_source"/more_spec/clustering.R_0000/relationship_between_communities_kegg_0.05.png" results/clusters_summary_figures/relationship_between_communities_kegg_0.05.png
+cp $results_source"/more_spec/clustering.R_0002/summary_dendograme_reactome_0.05.png" results/clusters_summary_figures/summary_dendograme_reactome_0.05.png
+cp $results_source"/more_spec/clustering.R_0002/top_connected_nodes_reactome_0.05.png" results/clusters_summary_figures/top_connected_nodes_reactome_0.05.png
+cp $results_source"/more_spec/clustering.R_0002/relationship_between_communities_reactome_0.05.png" results/clusters_summary_figures/relationship_between_communities_reactome_0.05.png
+cp $results_source"/more_spec/clustering.R_0001/summary_dendograme_go_0.05.png" results/clusters_summary_figures/summary_dendograme_go_0.05.png
+cp $results_source"/more_spec/clustering.R_0001/top_connected_nodes_go_0.05.png" results/clusters_summary_figures/top_connected_nodes_go_0.05.png
+cp $results_source"/more_spec/clustering.R_0001/relationship_between_communities_go_0.05.png" results/clusters_summary_figures/relationship_between_communities_go_0.05.png
+
 #Create Report
 create_report.R -t report_templates/pairs_report_template.Rmd -o results/S1_Report_pairs_report.html -d results/table_metrics.txt -H t
 create_report.R -t report_templates/clustering_report_template.Rmd -o results/S2_Report_clustering_report.html -d results/table_metrics.txt -H t
