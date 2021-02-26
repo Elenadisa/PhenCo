@@ -1,11 +1,11 @@
 build_phen_gene_network){
 	#GENERATES PHENOTYPE-GENE RELATIONS
 	# Load Python
-	module load python/anaconda-3_440
+	#module load python/anaconda-3_440
 	# Load R
-	source ~soft_bio_267/initializes/init_R
+	#source ~soft_bio_267/initializes/init_R
 	# Load Netanalyzer
-	source ~soft_bio_267/initializes/init_netanalyzer
+	#source ~soft_bio_267/initializes/init_netanalyzer
 
 	#Path to scripts
 	PATH=$current_dir'/scripts/R_scripts':$PATH
@@ -31,7 +31,7 @@ build_phen_gene_network){
 build_phen_phen_network){
 	#GENERATES PHENOTYPE-PHENOTYPE AND MORES-SPECIFIC PAIRS LIST
 	# Load netanalyzer
-	source ~soft_bio_267/initializes/init_netanalyzer
+	#source ~soft_bio_267/initializes/init_netanalyzer
 	# NetAnalyzer layers -> HPO and patients
 	LAYERS='hpo,HP:;patients,[0-9]'
 	
@@ -53,7 +53,7 @@ build_phen_phen_network){
 generate_random_models_[links;nodes]){
 	#GENERATES MORE-SPECIFIC RANDOM MODELS
 	#initialize R
-	source ~soft_bio_267/initializes/init_R
+	#source ~soft_bio_267/initializes/init_R
 
 	name=`echo | awk '{if("(*)" == "links") print "more_spec_l_rdm"; else print "more_spec_n_rdm" }'`
 	mkdir random_models
@@ -68,8 +68,8 @@ generate_random_models_[links;nodes]){
 
 generate_less_spec_pairs){
 	#GENERATES LESS-SPECIFIC PAIR LISTS AND THEIR RANDOM MODELS
-	module load python/anaconda-3_440
-	source ~soft_bio_267/initializes/init_R
+	#module load python/anaconda-3_440
+	#source ~soft_bio_267/initializes/init_R
 	export PATH=$current_dir'scripts/py_scripts':$PATH
 	mkdir less_spec_pairs
 	mkdir random_less_spec_pairs
@@ -96,7 +96,7 @@ generate_less_spec_pairs){
 generated_unconnected_pairs){
 	#GENERATES UNCONNECTED LISTS
 	#Load python
-	module load python/anaconda-3_440	
+	#module load python/anaconda-3_440	
 	export PATH=$current_dir'scripts/py_scripts':$PATH
 	#Establis pairs numbers to get
 	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
@@ -137,7 +137,7 @@ get_genes_for_each_term){
 single_term_enrichment_analysis_[kegg;go;reactome]){
 	#SINGLE PHENOTYPE ENRICHMENT ANALYSIS
 	#Initialize R
-	source ~soft_bio_267/initializes/init_R
+	#source ~soft_bio_267/initializes/init_R
 
 	parsed_p_values=`echo '$p_values' | tr '/' ' '`
 	for PVALUE in $parsed_p_values

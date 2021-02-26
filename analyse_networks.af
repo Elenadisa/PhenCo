@@ -1,8 +1,8 @@
 term_pairs_comention_analysis){
 	#ANALYSE COMENTION DATA
 	#Initialize R and python
-    module load python/anaconda-3_440
-    source ~soft_bio_267/initializes/init_R
+    #module load python/anaconda-3_440
+    #source ~soft_bio_267/initializes/init_R
     #Path to scripts
     PATH=$current_dir'/scripts/py_scripts':$PATH
 	export PATH 
@@ -23,9 +23,9 @@ term_pairs_comention_analysis){
 obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair){
 	#TOPOLOGY ANALYSIS-OVERLAP WITH GENS/DISEASE FOR PAIRS
 	#Initialize R, python, ruby	
-	module load python/anaconda-3_440
-	module load ruby/2.4.1
-	source ~soft_bio_267/initializes/init_R
+	#module load python/anaconda-3_440
+	#module load ruby/2.4.1
+	#source ~soft_bio_267/initializes/init_R
 	#Path to Ssripts
 	PATH=$current_dir'/scripts/R_scripts':$PATH
 	PATH=$current_dir'/scripts/py_scripts':$PATH
@@ -81,8 +81,8 @@ obtain_topology_data_and_get_genes_and_diseases_for_each_term_pair){
 term_pairs_enrichment_analysis_[kegg;go;reactome]){
 	#PHENOTYPE PAIRS ENRICHMENT ANALYSIS
 	#Initialize R and ruby
-	module load ruby/2.4.1
-	source ~soft_bio_267/initializes/init_R
+	#module load ruby/2.4.1
+	#source ~soft_bio_267/initializes/init_R
 	#Get the name and type of pairs
 	net_name=`basename $working_net`
 	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
@@ -122,8 +122,8 @@ clustering_analysis_[kegg;go;reactome]){
 	#CLUSTER ANALYSIS
 	resources: -m 2gb -t '7-00:00:00' -n 'cal'
 	#Initianilize python and R
-	module load python/anaconda-3_440
-	source ~soft_bio_267/initializes/init_R
+	#module load python/anaconda-3_440
+	#source ~soft_bio_267/initializes/init_R
 	PATH=$current_dir'/scripts/R_scripts':$PATH
 	PATH=$current_dir'/scripts/py_scripts':$PATH
 	export PATH
@@ -225,7 +225,7 @@ clustering_metrics_[kegg;go;reactome]){
 	#GET CLUSTER AND PATIENTS TABLES/DETAILS
 	resources: -m 2gb -t '7-00:00:00' -n 'cal'
 	#Initializes python
-	module load python/anaconda-3_440
+	#module load python/anaconda-3_440
 	PATH=$current_dir'/scripts/py_scripts':$PATH
 	export PATH
 	#Get the name and type of pairs
@@ -289,7 +289,7 @@ clustering_metrics_[kegg;go;reactome]){
 collect_systems_hpo_files){
 	#COLLECT CLUSTERS ANALYSIS RESULTS
 	resources: -m 2gb -t '7-00:00:00' -n 'cal'
-	module load python/anaconda-3_440
+	#module load python/anaconda-3_440
 	#Get the name and type of pairs
 	net_name=`basename $working_net`
 	net_type=`echo $net_name | sed 's/_[0-9]*$//g'`
