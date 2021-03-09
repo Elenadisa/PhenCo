@@ -10,6 +10,8 @@ framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
 export PATH=$CODE_PATH'/sys_bio_lab_scripts:'$PATH
 export PATH=$CODE_PATH'/scripts/py_scripts:'$PATH
+export PATH=$CODE_PATH'/scripts/R_scripts:'$PATH
+
 
 #DOWNLOAD EXTERNAL FILES 
 
