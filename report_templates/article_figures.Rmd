@@ -216,7 +216,7 @@ produce_stacked_barplot <- function( column1, column2, column3, title, ylab, add
 ```{r  echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
 
-df <- read.table("/mnt/scratch/users/bio_267_uma/elenads/build_both_nets_enriched/NetAnalyzer.rb_0001/phen2phen_net", sep ="\t", header = FALSE)
+df <- read.table("../results/phen2phen_net", sep ="\t", header = FALSE)
 colnames(df) <- c("HPO-A", "HPO-B", "HyI")
 prevalence_single_decipher <- read.table("/mnt/scratch/users/bio_267_uma/elenads/build_both_nets_enriched/shuf_0000/all_hpo_prevalence", sep ="\t", header = FALSE)
 prevalence_pairs_decipher <- load_files(metric_table, "Type", "decipher_pairs_prevalence", header=FALSE)
