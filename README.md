@@ -64,7 +64,7 @@ install.packages(c('optparse', 'ggplot2', 'dplyr', 'reshape', 'knitr', 'linkcomm
 Furthermore, these bioconductor packages should be installed using the the BiocManager package
 
 ``
-BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE"))  
+BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE", "KEGG.db", "GO.db"))  
 `` 
 
 ### Input file format 
