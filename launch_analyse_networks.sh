@@ -4,6 +4,12 @@
 
 current_dir=`pwd`
 
+export CODE_PATH=$(readlink -f $framework_dir )
+export PATH=$CODE_PATH'/sys_bio_lab_scripts:'$PATH
+export PATH=$CODE_PATH'/scripts/py_scripts:'$PATH
+export PATH=$CODE_PATH'/R_cripts/rscripts:'$PATH
+
+
 #PATH TO build_networks.sh RESULTS
 data_source=PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 #PATH TO DIRECTORY WITH PAIRS LISTS
