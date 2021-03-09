@@ -78,6 +78,7 @@ generate_less_spec_pairs){
 	echo -e  "Number_of_less_specific_pairs\t`wc -l  less_specific_pairs | cut -d ' ' -f 1` " >> ../build_metrics
 	#Establish the number of pairs to get
 	pair_number=`wc -l build_phen_phen_network)/more_spec | cut -f 1 -d ' '`
+	calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > all_hpo_prevalence
 	
 	
 	for i in {1..$number_of_random_models}
