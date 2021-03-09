@@ -22,6 +22,7 @@ export PATH=$CODE_PATH'/scripts/R_scripts:'$PATH
 mkdir results
 cat processed_data/build_metrics $build_result_source/build_metrics > results/build_metrics
 cp $build_results_source"/NetAnalyzer.rb_0001/phen2phen_net"  results/phen2phen_net
+cp $build_results_source"/shuf_0000/all_hpo_prevalence" results/all_hpo_prevalence
 
 cat $results_source/*/metrics > results/all_metrics
 create_metric_table.rb results/all_metrics_renamed 'Name,Type' results/table_metrics.txt
