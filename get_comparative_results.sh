@@ -13,9 +13,11 @@ results_source=PATH/TO/OUTPUT/FILES/PhenCo/analyse_networks
 
 build_results_source=/PATH/TO/OUTPUT/FILES/PhenCo/build_networks
 
-PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/rscripts:$PATH
-PATH=/mnt/home/users/bio_267_uma/elenads/projects/comorbidity_def_test/scripts/py_scripts:$PATH
-export PATH
+framework_dir=`dirname $0`
+export CODE_PATH=$(readlink -f $framework_dir )
+export PATH=$CODE_PATH'/sys_bio_lab_scripts:'$PATH
+export PATH=$CODE_PATH'/scripts/py_scripts:'$PATH
+export PATH=$CODE_PATH'/scripts/R_scripts:'$PATH
 
 mkdir results
 cat processed_data/build_metrics $build_result_source/build_metrics > results/build_metrics
