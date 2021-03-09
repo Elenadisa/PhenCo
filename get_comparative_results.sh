@@ -25,7 +25,7 @@ cp $build_results_source"/NetAnalyzer.rb_0001/phen2phen_net"  results/phen2phen_
 cp $build_results_source"/shuf_0000/all_hpo_prevalence" results/all_hpo_prevalence
 
 cat $results_source/*/metrics > results/all_metrics
-create_metric_table.rb results/all_metrics_renamed 'Name,Type' results/table_metrics.txt
+create_metric_table.rb results/all_metrics 'Name,Type' results/table_metrics.txt
 
 cp $results_source/more_spec/metrics results/more-spec_metrics
 patient=$results_source"/more_spec/patient_cluster_merger.py_0001/patient_hpo_genes_go_0.05"
