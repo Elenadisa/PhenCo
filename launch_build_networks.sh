@@ -88,8 +88,8 @@ calculate_prevalence_hpo.py -f $patient2hpo_unenriched  -t 0 > results/all_hpo_p
 #module load ruby/2.4.1
 
 #UNCOMMENT THE TWO FOLLOWING LINES TO RUN COMENTION ANALYSIS
-#rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
-#pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
+rm processed.temp processed_data/HPO2pubmed processed_data/failed_queries
+pubmedIdRetriever.rb processed_data/filtered_HPO_table.txt >> processed_data/HPO2pubmed 2> processed_data/failed_queries
 #module purge
 
 
