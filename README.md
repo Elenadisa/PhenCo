@@ -70,16 +70,16 @@ BiocManager::install(c("clusterProfiler", "ReactomePA", "org.Hs.eg.db", "DOSE", 
 ### Input file format 
 
 A confidentially agreements necessary to use the DECIPHER patient data.  
-There is a test file with an example of the format that the input file must have (test_input.txt)  
+There is a test file with an example of the format that the input file must have (test_input.txt). With this file only the the first two parts of the workflow can be executed.   
 
 ## Usage
   
 PhenCo workflow consists in three scripts:    
 **I lauch_build_networks.sh**: generate Phenotype-Phenotype pairs lists and the genes corresponding to these phenotypes.    
 It execute an autoflow template *build_networks.af*.   
-**I launch_analayse_network.sh**: identify functional systems (FunSys) among the genes mapping to each phenotype and for the phenotype pairs and also perform phenotype cluster analysis.   
+**II launch_analayse_network.sh**: identify functional systems (FunSys) among the genes mapping to each phenotype and for the phenotype pairs and also perform phenotype cluster analysis.   
 It execute an autoflow template *analyse_network.af*.   
-**II get_comparative_results.sh**: generates html reports with workflow results.   
+**III get_comparative_results.sh**: generates html reports with workflow results.   
 
 
 ### Defining input/output paths. 
